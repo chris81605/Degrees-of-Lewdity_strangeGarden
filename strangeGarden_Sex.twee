@@ -1,0 +1,24 @@
+:: strangeGarden_Sex
+<<set $outside to 1>><<effects>>
+<<if $sexstart is 1>>
+	<<set $sexstart to 0>>
+	<<consensual>>
+	<<set $consensual to 1>>
+	<<neutral 1>>
+	<<maninit>>
+	<<set $enemytrust += 500>><<promiscuity5>>
+	<<he>>顯然非常興奮，急切的向你靠了過來，甚至沒有給你選擇地方的時間。<br>
+<</if>>
+
+<<set $enemyanger to 0>>
+<<effects>>
+<<effectsman>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+<<if _combatend>>
+	<span id="next"><<link [[继续|strangeGarden_Sex_Finish]]>><</link>></span><<nexttext>>
+<<else>>
+	<span id="next"><<link [[继续|strangeGarden_Sex]]>><</link>></span><<nexttext>>
+<</if>>

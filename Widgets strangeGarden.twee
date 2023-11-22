@@ -1,0 +1,695 @@
+:: Widgets strangeGarden [widget]
+<<widget "SG_plots_init">>
+	/*
+	* First argument: location.
+	* Second argument: number of plots.
+	* Third argument: ground type (earth, water).
+	* Fourth argument: plot quality
+	* Fifth argument: plot size */
+	/* Note: if you plan to add a new plot size, make sure to update all the places where plot size is hardcoded. */
+	<<set $_plotsInLocation to []>>
+	<<for _i to 0; _i lt _args[1]; _i++>>
+		<<set $_plotsInLocation[_i] to clone(setup.tending.plot_base)>>
+		<<set $_plotsInLocation[_i].bed to _args[2]>>
+		<<set $_plotsInLocation[_i].quality to _args[3]>>
+		<<set $_plotsInLocation[_i].size to _args[4]>>
+	<</for>>
+	<<set $plots[_args[0]] to $_plotsInLocation>>
+<</widget>>
+
+<<widget "SG_add_plot">>
+	/*Adds a plot to an existing location. Arguments are as in the plots_init widget, but the second argument and beyond are shifted down one.*/
+	<<set $_plotsInLocation to $plots[_args[0]]>>
+	<<set $_last to $_plotsInLocation.length>>
+	<<set $_plotsInLocation.push(clone(setup.tending.plot_base))>>
+	<<set $_plotsInLocation[$_last].bed to _args[1]>>
+	<<set $_plotsInLocation[$_last].quality to _args[2]>>
+	<<set $_plotsInLocation[$_last].size to _args[3]>>
+<</widget>>
+
+<<widget "SG_clear_plot">>
+	/*Returns a plot to its default state.
+	First argument: location.
+	Second argument: index of plot to be reset.
+	OR
+	First argument: the plot to operate on.
+	*/
+	<<if _args[1] isnot undefined>>
+		<<set $_plot to $plots[_args[0]][_args[1]]>>
+	<<else>>
+		<<set $_plot to _args[0]>>
+	<</if>>
+
+	<<if $_plot.baseQuality isnot undefined and !$backgroundTraits.includes("greenthumb")>>
+		<<if $_plot.fertiliserDecay gt 0>>
+			<<set $_plot.fertiliserDecay-->>
+		<</if>>
+		<<if $_plot.fertiliserDecay is 0 and $_plot.quality gt $_plot.baseQuality>>
+			<<set $_plot.quality-->>
+			<<set $tendingvars.plotDecay to 2>>
+			<<if $_plot.quality gt $_plot.baseQuality>>
+				<<set $_plot.fertiliserDecay to 2>>
+				<<if $_plot.size isnot "large">>
+					<<set $_plot.fertiliserDecay to 3>>
+				<</if>>
+				<<set $tendingvars.plotDecay to 1>>
+			<</if>>
+		<</if>>
+	<</if>>
+
+	<<set $_plot.water to 0>>
+	<<set $_plot.days to 0>>
+	<<set $_plot.plant to "none">>
+	<<set $_plot.till to 0>>
+	<<set $_plot.stage to 0>>
+<</widget>>
+
+<<widget "SG_display_quality">><<silently>>
+	<<set $_plot to _args[0]>>
+	<<switch $_plot.bed>>
+		<<case "water">><<set _bedType to "池子">>
+		<<case "earth">><<set _bedType to "土壤">>
+		<<case "wood">><<set _bedType to "木頭">>
+		<<case "hive">><<set _bedType to "蜂箱">>
+		<<case "cow">><<set _bedType to "長得像奶牛乳房的奇怪物體">>
+		<<case "bird_nest">><<set _bedType to "奇怪的鳥巢">>
+		<<case "human">><<set _bedType to "長得像人的奇怪物體">>
+		<<default>><<set _bedType to clone($_plot.bed)>>
+	<</switch>>
+	<<if $_plot.bed is "wood">>
+		<<switch Math.clamp($_plot.quality, 0, 4)>>
+			<<case 1>> <<set $_result to `<span class="blue">破爛的`+_bedType+`</span>`>>
+			<<case 2>> <<set $_result to `<span class="lblue">普通的`+_bedType+`</span>`>>
+			<<case 3>> <<set $_result to `<span class="teal">優良的`+_bedType+`</span>`>>
+			<<case 4>><<set $_result to `<span class="green">上好的`+_bedType+`</span>`>>
+			<<default>> <<set $_result to `<span class="red">错误</span>`>>
+		<</switch>>
+	<<elseif $_plot.bed is "hive">>
+		<<switch Math.clamp($_plot.quality, 0, 4)>>
+			<<case 1>> <<set $_result to `<span class="blue">迷你的`+_bedType+`</span>`>>
+			<<case 2>> <<set $_result to `<span class="lblue">小的`+_bedType+`</span>`>>
+			<<case 3>> <<set $_result to `<span class="teal">中等的`+_bedType+`</span>`>>
+			<<case 4>><<set $_result to `<span class="green">特大的`+_bedType+`</span>`>>
+			<<default>> <<set $_result to `<span class="red">错误</span>`>>
+		<</switch>>
+	<<elseif $_plot.bed is "cow">>
+		<<switch Math.clamp($_plot.quality, 0, 4)>>
+			<<case 1>> <<set $_result to `<span class="blue">瘦弱的`+_bedType+`</span>`>>
+			<<case 2>> <<set $_result to `<span class="lblue">普通的`+_bedType+`</span>`>>
+			<<case 3>> <<set $_result to `<span class="teal">碩大的`+_bedType+`</span>`>>
+			<<case 4>><<set $_result to `<span class="green">無與倫比的`+_bedType+`</span>`>>
+			<<default>> <<set $_result to `<span class="red">错误</span>`>>
+		<</switch>>
+	<<elseif $_plot.bed is "bird_nest">>
+		<<switch Math.clamp($_plot.quality, 0, 4)>>
+			<<case 1>> <<set $_result to `<span class="blue">一個`+_bedType+`</span>`>>
+			<<case 2>> <<set $_result to `<span class="lblue">幾個`+_bedType+`</span>`>>
+			<<case 3>> <<set $_result to `<span class="teal">很多個`+_bedType+`</span>`>>
+			<<case 4>><<set $_result to `<span class="green">無數個`+_bedType+`</span>`>>
+			<<default>> <<set $_result to `<span class="red">错误</span>`>>
+		<</switch>>
+	<<elseif $_plot.bed is "human">>
+		<<switch Math.clamp($_plot.quality, 0, 4)>>
+			<<case 1>> <<set $_result to `<span class="blue">_bedType</span>`>>
+			<<case 2>> <<set $_result to `<span class="lblue">普通的`+_bedType+`</span>`>>
+			<<case 3>> <<set $_result to `<span class="teal">良好的`+_bedType+`</span>`>>
+			<<case 4>><<set $_result to `<span class="green">優良的`+_bedType+`</span>`>>
+			<<default>> <<set $_result to `<span class="red">错误</span>`>>
+		<</switch>>	
+	<<else>>
+		<<switch Math.clamp($_plot.quality, 0, 4)>>
+			<<case 1>> <<set $_result to `<span class="blue">贫瘠的`+_bedType+`</span>`>>
+			<<case 2>> <<set $_result to `<span class="lblue">普通的`+_bedType+`</span>`>>
+			<<case 3>> <<set $_result to `<span class="teal">肥沃的`+_bedType+`</span>`>>
+			<<case 4>><<set $_result to `<span class="green">沃腴的`+_bedType+`</span>`>>
+			<<default>> <<set $_result to `<span class="red">错误</span>`>>
+		<</switch>>
+	<</if>>
+<</silently>><<print $_result>><</widget>>
+
+<<widget "SG_display_plot">>/*Argument is the plot location you want to display.*/
+	<<set _location to _args[0]>>
+	<<set $_plotsHere to $plots[_location]>>
+	<<set _water_needed to 0>>
+	这里有<span class="gold"><<number $_plotsHere.length>>個</span>可使用的設備
+	。
+	<<if $SG_fertiliser.current + $SG_fertiliser.used gt 0>>
+		你现在有<span class="gold"><<number $SG_fertiliser.current>>袋</span>特殊原料。。
+	<</if>>
+	操作設備的時間會随着你护理技能的升高而减少。
+	<br><br>
+
+	<<set $_i to 1>>
+
+	<<for _plantbed range $_plotsHere>>
+		<<capture _plantbed>>
+			<span class="gold">第 $_i 号設備(<<SG_display_quality _plantbed>>):</span>
+			<<set $_plot to _plantbed>>
+			<<if _plantbed.stage gte 1>>
+				<<set $_plantedPlant to setup.plants[_plantbed.plant]>>
+
+				<<if $weather is "rain">>
+					<<set _plantbed.water to 1>>
+				<</if>>
+			<</if>>
+
+			<<if _plantbed.stage gte 5>>
+				<<if $_plot.bed is "wood">>
+					<span class="green">這裡種植了<<print $_plantedPlant.plural>>，<<print $_plantedPlant.plural>>已經開傘了，可以收成了。</span>
+				<<elseif $_plot.bed is "hive">>
+					<span class="green">這裡生產<<print $_plantedPlant.plural>>，裏頭的<<print $_plantedPlant.plural>>滿溢而出，可以收成了。</span>
+				<<elseif $_plot.bed is "cow">>
+					<span class="green">這裡生產<<print $_plantedPlant.plural>>奶牛的乳房膨脹到極限了，乳汁正順著乳頭滴落，可以擠奶了。</span>
+				<<elseif $_plot.bed is "bird_nest">>
+					<span class="green">鳥巢裡生產<<print $_plantedPlant.plural>>，現在裏頭有許多<<print $_plantedPlant.plural>>。</span>
+				<<elseif $_plot.bed is "human">>
+					<<if $_plantedPlant.plural is "小瓶装母乳" or $_plantedPlant.plural is "瓶装母乳">>
+						<span class="green">像人的奇怪物體的乳房膨脹到極限了，乳汁正順著乳頭滴落，可以擠奶了。</span>
+					<<elseif $_plantedPlant.plural is "瓶装精液">>
+						<span class="green">像人的奇怪物體的蛋蛋膨脹到極限了，棒狀物體高高的翹起，精液正不斷湧出，可以榨精了。</span>
+					<</if>>	
+				<<else>>
+					<span class="green"><<print $_plantedPlant.plural>>正在开花，马上就可以采摘了。</span>
+				<</if>>
+				<br>
+				<<switch _plantbed.size>>
+					<<case "small">> <<set $_timeStr to "0:05">><<set _pass to 5>>
+					<<case "medium">> <<set $_timeStr to "0:15">><<set _pass to 15>>
+					<<default>> <<set $_timeStr to "1:00">><<set _pass to 60>>
+				<</switch>>
+
+				<<if $leftarm is "bound" and $rightarm is "bound">>
+					<span class="red">你的手臂被捆绑住了，你无法使用設備。</span>
+				<<else>>
+					<<if $options.images is 1 and $_plantedPlant.icon>>
+						<img class="tending_icon" @src="`img/misc/icon/tending/` + $_plantedPlant.icon">
+					<</if>>
+					<<link "收成 ($_timeStr)" $passage>><<pass _pass>><<SG_tending_harvest _plantbed>><<clear_plot _plantbed>><</link>>
+				<</if>>
+				<br>
+
+			<<elseif _plantbed.stage is 4>>
+				<<if $_plot.bed is "wood">>
+					<span class="teal">這裡種植了<<print $_plantedPlant.plural>>，<<print $_plantedPlant.plural>>快開傘了。</span>
+				<<elseif $_plot.bed is "hive">>
+					<span class="teal">這裡生產<<print $_plantedPlant.plural>>，裏頭的<<print $_plantedPlant.plural>>快滿了。</span>
+				<<elseif $_plot.bed is "cow">>
+					<span class="teal">這裡生產<<print $_plantedPlant.plural>>奶牛的乳房正在膨脹，現在有一定規模了，即將產奶。</span>
+				<<elseif $_plot.bed is "bird_nest">>
+					<span class="teal">鳥巢裡生產<<print $_plantedPlant.plural>>，現在裏頭沒有蛋，也許快有了。</span>
+				<<elseif $_plot.bed is "human">>
+					<<if $_plantedPlant.plural is "小瓶装母乳" or $_plantedPlant.plural is "瓶装母乳">>
+						<span class="teal">像人的奇怪物體的乳房正在膨脹，現在有一定規模了，即將產奶。</span>
+					<<elseif $_plantedPlant.plural is "瓶装精液">>
+						<span class="teal">像人的奇怪物體的蛋蛋正在膨脹，現在有一定規模了，棒狀物體也脹大變硬，快可以榨精了。</span>
+					<</if>>	
+				<<else>>
+					<span class="teal"><<print $_plantedPlant.plural>>正在生長。</span>
+				<</if>>
+			<<elseif _plantbed.stage is 3>>
+				<<if $_plot.bed is "wood">>
+					<span class="lblue">這裡種植了<<print $_plantedPlant.plural>>，<<print $_plantedPlant.plural>>正在生長。</span>
+				<<elseif $_plot.bed is "hive">>
+					<span class="lblue">這裡生產<<print $_plantedPlant.plural>>，裏頭的<<print $_plantedPlant.plural>>半滿了。</span>
+				<<elseif $_plot.bed is "cow">>
+					<span class="lblue">這裡生產<<print $_plantedPlant.plural>>奶牛的乳房正在膨脹。</span>
+				<<elseif $_plot.bed is "bird_nest">>
+					<span class="lblue">鳥巢裡生產<<print $_plantedPlant.plural>>，現在裏頭沒有蛋。</span>
+				<<elseif $_plot.bed is "human">>
+					<<if $_plantedPlant.plural is "小瓶装母乳" or $_plantedPlant.plural is "瓶装母乳">>
+						<span class="lblue">像人的奇怪物體的乳房正在膨脹。</span>
+					<<elseif $_plantedPlant.plural is "瓶装精液">>
+						<span class="lblue">像人的奇怪物體的蛋蛋正在膨脹。</span>
+					<</if>>	
+				<<else>>
+					<span class="lblue"><<print $_plantedPlant.plural>>正在生長。</span>
+				<</if>>
+			<<elseif _plantbed.stage is 2>>
+				<<if $_plot.bed is "wood">>
+					<span class="blue">這裡種植了<<print $_plantedPlant.plural>>，<<print $_plantedPlant.plural>>長出一點了。</span>
+				<<elseif $_plot.bed is "hive">>
+					<span class="blue">這裡生產<<print $_plantedPlant.plural>>，裏頭有些<<print $_plantedPlant.plural>>。</span>
+				<<elseif $_plot.bed is "cow">>
+					<span class="blue">這裡生產<<print $_plantedPlant.plural>>奶牛的乳房似乎有點膨脹。</span>
+				<<elseif $_plot.bed is "bird_nest">>
+					<span class="blue">鳥巢裡生產<<print $_plantedPlant.plural>>，現在裏頭沒有蛋。</span>
+				<<elseif $_plot.bed is "human">>
+					<<if $_plantedPlant.plural is "小瓶装母乳" or $_plantedPlant.plural is "瓶装母乳">>
+						<span class="blue">像人的奇怪物體的乳房似乎有點膨脹。</span>
+					<<elseif $_plantedPlant.plural is "瓶装精液">>
+						<span class="blue">像人的奇怪物體的蛋蛋似乎有點膨脹。</span>
+					<</if>>	
+				<<else>>
+					<span class="blue"><<print $_plantedPlant.plural>>正在生長。</span>
+				<</if>>
+			<<elseif _plantbed.stage is 1>>
+				<<if $_plot.bed is "wood">>
+					<span class="blue">這裡種植了<<print $_plantedPlant.plural>>。</span>
+				<<elseif $_plot.bed is "hive">>
+					<span class="blue">這裡準備生產<<print $_plantedPlant.plural>>。</span>
+				<<elseif $_plot.bed is "cow">>
+					<span class="blue">這裡準備生產<<print $_plantedPlant.plural>>。</span>
+				<<elseif $_plot.bed is "bird_nest">>
+					<span class="blue">鳥巢裡準備生產<<print $_plantedPlant.plural>>。</span>
+				<<elseif $_plot.bed is "human">>
+					<<if $_plantedPlant.plural is "小瓶装母乳" or $_plantedPlant.plural is "瓶装母乳">>
+						<span class="blue">像人的奇怪物體長出了乳房。</span>
+					<<elseif $_plantedPlant.plural is "瓶装精液">>
+						<span class="blue">像人的奇怪物體的長出了蛋蛋以及一根棒狀物體。</span>
+					<</if>>	
+				<<else>>
+					<span class="blue"><<print $_plantedPlant.plural>>正在生長。</span>
+				<</if>>
+			<<else>>
+				<<if _plantbed.till gte 1>>
+					設備已准备好生產。
+					<<SG_tendingPlantSeedsOptions _location _plantbed>>
+				<<else>>
+					設備生產前準備。
+					<br>
+					<<SG_tendingTillOptions _plantbed>>
+				<</if>>
+			<</if>>
+			<<if _plantbed.stage gte 1 and _plantbed.stage lt 5>>
+				<<if _plantbed.bed is "water">>
+					<span class="green"><<print (_plantbed.bed is "large" ? "池塘" : "池塘")>>無需特別照顧。</span>
+					<br>
+				<<elseif _plantbed.bed is "earth">>
+					<<if _plantbed.water is 1>>
+						<span class="green"><<print (_plantbed.bed is "large" ? "土壤" : "土壤")>>已经澆水了。</span>
+						<br>
+					<<else>>
+						<span class="purple"><<print (_plantbed.bed is "large" ? "土壤" : "土壤")>>尚未澆水。</span>
+						<br>
+						<<SG_tendingWaterPlot _plantbed>>
+						<br>
+					<</if>>	
+				<<elseif _plantbed.bed is "wood">>
+					<<if _plantbed.water is 1>>
+						<span class="green"><<print (_plantbed.bed is "large" ? "木頭" : "木頭")>>已经澆水了。</span>
+						<br>
+					<<else>>	
+						<span class="purple"><<print (_plantbed.bed is "large" ? "木頭" : "木頭")>>尚未澆水。</span>
+						<br>
+						<<SG_tendingWaterPlot _plantbed>>
+					<</if>>	
+				<<elseif _plantbed.bed is "hive">>
+					<<if _plantbed.water is 1>>
+						<span class="green"><<print (_plantbed.bed is "large" ? "蜂箱" : "蜂箱")>>已经打掃乾淨了。</span>
+						<br>
+					<<else>>	
+						<span class="purple"><<print (_plantbed.bed is "large" ? "蜂箱" : "蜂箱")>>尚未打掃。</span>
+						<br>
+						<<SG_tendingWaterPlot _plantbed>>
+					<</if>>	
+				<<elseif _plantbed.bed is "cow">>
+					<<if _plantbed.water is 1>>
+						<span class="green"><<print (_plantbed.bed is "large" ? "長得像奶牛乳房的奇怪物體" : "長得像奶牛乳房的奇怪物體")>>已经清理乾淨了。</span>
+						你不曉得它運作的原理，也只能維持設備表面清潔了。
+						<br>
+					<<else>>	
+						<span class="purple"><<print (_plantbed.bed is "large" ? "長得像奶牛乳房的奇怪物體" : "長得像奶牛乳房的奇怪物體")>>尚未清理。</span>
+						<br>
+						<<SG_tendingWaterPlot _plantbed>>
+					<</if>>
+				<<elseif _plantbed.bed is "bird_nest">>
+					<<if _plantbed.water is 1>>
+						<span class="green"><<print (_plantbed.bed is "large" ? "鳥屋" : "鳥屋")>>已經打掃乾淨，並提供必要的食物與水。</span>
+						<br>
+					<<else>>	
+						<span class="purple"><<print (_plantbed.bed is "large" ? "鳥屋" : "鳥屋")>>尚未清理。</span>
+						<br>
+						<<SG_tendingWaterPlot _plantbed>>
+					<</if>>
+				<<elseif _plantbed.bed is "human">>
+					<<if _plantbed.water is 1>>
+						<span class="green"><<print (_plantbed.bed is "large" ? "人形的奇怪物體" : "人形的奇怪物體")>>已經清理乾淨了。</span>
+						你不曉得它運作的原理，也只能維持設備表面清潔了。
+						<br>
+					<<else>>	
+						<span class="purple"><<print (_plantbed.bed is "large" ? "人形的奇怪物體" : "人形的奇怪物體")>>尚未清理。</span>
+						<br>
+						<<SG_tendingWaterPlot _plantbed>>
+					<</if>>	
+				<</if>>
+			<</if>>
+			<br>
+
+		<</capture>>
+		<<set $_i++>>
+	<</for>>
+
+	<<if _water_needed gte 1>>
+		<<set _plotsToWater to $_plotsHere.filter(plot => plot.stage >= 1 && plot.stage < 5 && plot.bed !== "water" && plot.water === 0)>>
+		<<set _totalTimeToWater to 0>>
+		<<run _plotsToWater.forEach(plot => _totalTimeToWater += setup.tending.wateringTimes[plot.size])>>
+		<<set $_time to getTimeString(_totalTimeToWater)>>
+
+			<<if !($leftarm is "bound" and $rightarm is "bound")>>
+				<<gardenicon "water">>
+				<<link "给所有設備加水 ($_time)" $passage>>
+					<<SG_tendingWaterAllDryBeds _plotsToWater>><<tiredness _water_needed>><<physique _water_needed>><<tending _water_needed>>
+				<</link>><<gtiredness>><<gtending>>
+			<</if>>
+		<br>
+
+	<</if>>
+
+	<<if $debug is 1 and $_plotsHere.filter(plot => plot.stage > 0 && plot.stage < 5).length gte 1>>
+		<br>
+		<<link "DEBUG: Instagrow all plants here" $passage>><<run tendingInstaGrow(_location)>><</link>>
+		<br>
+	<</if>>
+<</widget>>
+
+<<widget "SG_tendingWaterPlot">>
+	<<set _plantbed to _args[0]>>
+
+	<<set _water_needed += 1>>
+	<<switch _plantbed.size>>
+		<<case "small">><<set _tStatup to 1>><<set _tPass to 5>>
+		<<case "medium">><<set _tStatup to 2>><<set _tPass to 15>>
+		<<default>><<set _tStatup to 6>><<set _tPass to 60>>
+	<</switch>>
+
+	<<set $_time to getTimeString(_tPass)>>
+	<<if $leftarm is "bound" and $rightarm is "bound">>
+		<span class="red">你的手臂被捆绑住了，你無法操作設備。</span>
+	<<else>>
+		<<gardenicon "water">>
+		<<link "操作 ($_time)" $passage>>
+			<<tending _tStatup>><<pass _tPass>><<set _plantbed.water to 1>><<set $tendingvars.plot_watered to true>>
+			<<tiredness _tStatup>><<physique _tStatup>><<event_trigger>>
+		<</link>><<gtiredness>><<gtending>>
+	<</if>>
+<</widget>>
+
+<<widget "SG_tendingWaterAllDryBeds">>
+	<<set $_plotsToWater to _args[0]>>
+
+	<<for $_plot range $_plotsToWater>>
+		<<set $_plot.water to 1>>
+		<<set _waterTime to setup.tending.wateringTimes[$_plot.size]>>
+		<<pass _waterTime>><<event_trigger>>
+	<</for>>
+	<<set $tendingvars.all_plots_watered to true>>
+<</widget>>
+
+<<widget "SG_tendingPlantSeedsOptions">>
+	<<set _location to _args[0]>>
+	<<set _plantbed to _args[1]>>
+
+	<<if $plants_known.length is 0>>
+		在野外寻找种子种植，或取得產品。
+	<</if>>
+	<<switch _location>>
+		<<case "farm">> <<set _irrigation to ($farm.irrigation ? $farm.irrigation : 0)>>
+		<<default>> <<set _irrigation to 0>>
+	<</switch>>
+	<<for _plantType range $plants_known>>
+		<br>
+		<<set $_plant to setup.plants[_plantType]>>
+		<<if $_plant.season.includes(Time.season) or (_location is "garden" and $alex_greenhouse gte 3)>>
+			/* comparing soil types; check if target bed is compatible with the seed's soil type */
+			<<if $_plant.bed is _plantbed.bed>>
+				<<switch _plantbed.size>>
+					<<case "small">><<set _passTime to 30>>
+					<<case "medium">><<set _passTime to 90>>
+					<<default>><<set _passTime to 180>>
+				<</switch>>
+				<<set $_timeString to getTimeString(_passTime)>>
+				<<capture _passTime _plantbed _plantType>>
+					<<if $options.images is 1 and $_plant.icon>>
+						<img class="tending_icon" @src="`img/misc/icon/tending/` + $_plant.icon">
+					<</if>>
+					<<link "生產$_plant.plural ($_timeString)" $passage>><<pass _passTime>><<run plantSeedsInPlot(_plantbed, _plantType)>><</link>>
+				<</capture>>
+				<<if $statdisable is "f">>
+					<span class="orange">(<<print $_plant.days>>天)</span>
+				<</if>>
+			<<else>>
+				<span class="blue"><<print $_plant.plural>>仅能于<<print $_plant.bed.replace("earth","土地里").replace("water","水池中").replace("wood","木頭上").replace("hive","蜂箱裡").replace("cow","長得像奶牛乳房的奇怪物體上").replace("bird_nest","奇怪的鳥巢中").replace("human","長得像人的奇怪物體裡")>>生產。</span>
+			<</if>>
+		<<else>>
+			<<tending_season_notice $_plant>>
+		<</if>>
+
+	<</for>>
+	<br>
+<</widget>>
+
+<<widget "SG_tendingTillOptions">>
+	<<set _plantbed to _args[0]>>
+
+	<<if currentSkillValue('tending') gte 1500>>
+		<<set _baseTime to 3>>
+		<<set _baseTiredness to 1>>
+	<<else>>
+		<<set $_ti to Math.clamp(Math.floor(currentSkillValue('tending') / 200), 0, 6)>>
+		<<set _baseTime to [30,25,20,15,10,5,4][$_ti]>>
+		<<set _baseTiredness to [6,5,4,3,2,1,1][$_ti]>>
+	<</if>>
+
+	<<if _plantbed.size is "medium">>
+		<<set _baseTime *= 3>>
+		<<set _baseTiredness *= 2>>
+	<<elseif _plantbed.size is "large">>
+		<<set _baseTime *= 12>>
+		<<set _baseTiredness *= 6>>
+	<</if>>
+
+	<<set _timeString to getTimeString(_baseTime)>>
+
+	<<if $farm_attack_timer is 0>>
+		<<set $_timeUntilAttack to ((23 - Time.hour) * 60) + (60 - Time.minute)>>
+	<</if>>
+	<<if $leftarm is "bound" and $rightarm is "bound">>
+		<span class="red">你的手臂被捆绑住了，你无法进耕种。</span>
+		<br>
+	<<else>>
+		<<capture _baseTiredness _baseTime _plantbed>>
+			<<gardenicon "till">>
+			<<link "生產 (_timeString)" $passage>>
+				<<set $tendingvars.plot_tilled to true>>
+				<<tiredness _baseTiredness>><<physique _baseTiredness>>
+				<<pass _baseTime>>
+				<<if $location is "farm">>
+					<<farm_count _baseTime>>
+				<</if>>
+				<<set _plantbed.till to 1>>
+			<</link>><<gtiredness>>
+		<</capture>>
+		<br>
+		<<if $SG_fertiliser.current gte 1 and _plantbed.quality lt 4 and currentSkillValue('tending') gte 400>>
+			<<set _baseTimeFert to Math.floor(_baseTime * 1.5)>>
+			<<set _timeString to getTimeString(_baseTimeFert)>>
+			<<set _fertTiredness to Math.floor(_baseTiredness * 1.5)>>
+			<<capture _baseTimeFert _fertTiredness _plantbed>>
+				<<gardenicon "fertiliser">>
+				<<link "生產和添加特殊原料 (_timeString)" $passage>>
+					/* Till */
+					<<set $tendingvars.plot_tilled_fertiliser to true>>
+					<<tiredness _fertTiredness>><<physique _fertTiredness>>
+					<<pass _baseTimeFert>>
+					<<if $location is "farm">>
+						<<farm_count _baseTimeFert>>
+					<</if>>
+					<<set _plantbed.till to 1>>
+
+					/* Fertilise */
+					<<set $SG_fertiliser.current-->><<set $SG_fertiliser.used++>>
+					<<set _plantbed.quality++>>
+					<<if !$backgroundTraits.includes("greenthumb")>>
+						<<if _plantbed.baseQuality is undefined>>
+							<<set _plantbed.baseQuality to clone(_plantbed.quality - 1)>>
+						<</if>>
+						<<set _plantbed.fertiliserDecay to 2>>
+						<<if _plantbed.size isnot "large">>
+							<<set _plantbed.fertiliserDecay++>>
+						<</if>>
+					<</if>>
+				<</link>><<gtiredness>>
+			<</capture>>
+			<br>
+		<</if>>
+	<</if>>
+<</widget>>
+
+<<widget "SG_plot_effects">>
+	<<if $tendingvars.plot_watered>>
+		你给設備添加必要的水分，<span class="gold">你得到了良好的锻炼。</span>
+		<br>
+	<<elseif $tendingvars.all_plots_watered>>
+		你给設備添必要的水分，<span class="gold">你得到了良好的锻炼。</span>
+		<br>
+	<</if>>
+	<<if $tendingvars.harvest>>
+		你收获了<<number $tendingvars.harvest_amount>><<print $tendingvars.harvest_name>>。
+		<<if $tendingvars.plotDecay>>
+			特殊原料的效果已经<<if $tendingvars.plotDecay is 2>>完全<</if>>消失了。
+		<</if>>
+		<br>
+	<</if>>
+	<<if $tendingvars.plot_tilled>>
+		你正在進行啟用設備前準備，啟用前準備工作很多，当你完成之后你就可以进行生產了。
+		<span class="gold">你得到了良好的锻炼。</span>
+		<br>
+	<</if>>
+	<<if $tendingvars.plot_tilled_fertiliser>>
+		你正在進行啟用設備前準備，啟用前準備工作很多，同时準備了一些特殊原料。啟用前準備工作很多，当你完成之后你就可以进行生產了。
+		<span class="gold">你得到了良好的锻炼。</span>
+	<</if>>
+	<<if $tendingvars.plot_planted>>
+		你把給設備做必要的清潔，及補充必須水分及其他耗材。
+		<br>
+	<</if>>
+	<<if $weather is "rain">>
+		<<if $strangeGarden_stage isnot 0>>
+			<span class="green">雨水淋湿了土地，同時也給設備補充了必要的水份，今日無須多做甚麼了，好好休息吧！</span>
+			<br>
+		<<else>>
+			<span class="green">雨水淋湿了大地。</span>
+			<br>
+		<</if>>	
+	<</if>>
+	<<run unsetTendingVars()>>
+<</widget>>
+
+<<widget "SG_tending_day">>
+	<<for _location range Object.keys($plots)>>
+		<<switch _location>>
+			<<case "farm">> <<set _irrigation to ($farm.irrigation ? $farm.irrigation : 0)>>
+			<<default>> <<set _irrigation to 0>>
+		<</switch>>
+		<<for $_plot range $plots[_location]>>
+			/* growth check */
+			<<if $_plot.stage gte 1 and ($_plot.water is 1 or $_plot.bed is "water")>>
+				<<set $_plot.days += 1>>
+				<<if $_plot.days gte setup.plants[$_plot.plant].days * (($_plot.stage+1) / 5)>>
+					<<set $_plot.stage += 1>>
+				<</if>>
+			<</if>>
+
+			/* should this check really happen AFTER the growth check? */
+			<<if $weather is "rain">>
+				<<set $_plot.water to 1>>
+			<<elseif _irrigation gte 1>>
+				<<set $_plot.water to 1>>
+				<<set _irrigation-->>
+			<<else>>
+				<<set $_plot.water to 0>>
+			<</if>>
+		<</for>>
+	<</for>>
+<</widget>>
+
+<<widget "SG_tending_harvest">>
+	/* Argument is the plot you want to harvest */
+	<<set $_plot to _args[0]>>
+	<<set $_type to $_plot.plant>>
+	<<if $plants[$_type] is undefined>>
+		<<set $plants[$_type] to {"name": setup.plants[$_type].name, "plural": setup.plants[$_type].plural, "amount": 0}>>
+	<<elseif $plants[$_type].name is undefined>>
+		<<set $plants[$_type] to {"name": setup.plants[$_type].name, "plural": setup.plants[$_type].plural, "amount": $plants[$_type].amount}>>
+	<</if>>
+	<<switch $_plot.size>>
+		<<case "small">> <<set _tending_amount to random(10, (currentSkillValue('tending') / 20) + 10)>>
+		<<case "medium">> <<set _tending_amount to random(10, (currentSkillValue('tending') / 10) + 20)>>
+		<<default>> <<set _tending_amount to random(10, (currentSkillValue('tending') / 2) + 50)>>
+	<</switch>>
+	<<set _tending_amount *= setup.plants[$_type].multiplier>>
+	<<switch Math.clamp($_plot.quality, 1, 4)>>
+		<<case 4>> <<set _tending_amount *= 1.6>>
+		<<case 3>> <<set _tending_amount *= 1.4>>
+		<<case 2>> <<set _tending_amount *= 1.2>>
+	<</switch>>
+	<<if !$backgroundTraits.includes("greenthumb") and $tending is 1000 and $plants_known.length gte 16 and
+	($SG_fertiliser.used gte 40 or ($SG_fertiliser.used gte 25 and $farm_stage gte 6))>>
+		<<run $backgroundTraits.pushUnique("greenthumb")>>
+		<span class="gold">花大量的时间在土地上劳作会让你成为园艺大师。</span>
+		<br>
+	<</if>>
+	<<if $backgroundTraits.includes("greenthumb")>>
+		<<set _tending_amount *= 1.2>>
+	<</if>>
+	<<set _tending_amount *= $tending_yield_factor>>
+
+	<<set _tending_amount to Math.trunc(_tending_amount)>>
+	<<set $plants[$_type].amount += _tending_amount>>
+
+	<<set $tendingvars.harvest to true>>
+	<<set $tendingvars.harvest_amount to _tending_amount>>
+	<<set $tendingvars.harvest_name to setup.plants[$_type].plural>>
+<</widget>>
+
+<<widget "SG_tending_pick">>
+	/*
+	* First argument: plant type.
+	* Second argument: minimum number picked.
+	* Third argument: maximum number picked.
+	*/
+	<<set $_type to _args[0]>>
+	<<if $plants[$_type] is undefined>>
+		<<set $plants[$_type] to {"name": setup.plants[$_type].name, "plural": setup.plants[$_type].plural, "amount": 0}>>
+	<<elseif $plants[$_type].name is undefined>>
+		<<set $plants[$_type] to {"name": setup.plants[$_type].name, "plural": setup.plants[$_type].plural, "amount": $plants[$_type].amount}>>
+	<</if>>
+
+	<<if _args[2] gte 1>>
+		<<set _tending_amount to random(_args[1], _args[2])>>
+	<<else>>
+		<<set _tending_amount to random(1, 5)>>
+	<</if>>
+
+	<<if !setup.plants[$_type].special.includes("large") and setup.plants[$_type].bed isnot "bird_nest">>
+		<<set _tending_amount *= (1 + (currentSkillValue('tending') / 1000))>>
+	<</if>>
+	<<if $backgroundTraits.includes("greenthumb")>>
+		<<set _tending_amount *= 1.2>>
+	<</if>>
+	<<set _tending_amount to Math.trunc(_tending_amount)>>
+	<<set $plants[$_type].amount += _tending_amount>>
+	<<set $wild_plant_stat += _tending_amount>>
+
+	你拿起
+	<<if $_type is "bird_egg">>
+		了
+	<</if>>
+	<<if _tending_amount is 1>>
+		<<if (["a","e","i","o","u","A","E","I","O","U"].some(letter => $_type.startsWith(letter)))>>
+			一个
+		<<else>>
+			一个
+		<</if>>
+		<<if $options.images is 1 and setup.plants[$_type].icon>>
+			<img class="tending_icon" @src="`img/misc/icon/tending/` + setup.plants[$_type].icon">
+		<</if>>
+		<<print setup.plants[$_type].plural>>。
+	<<else>>
+		<<if $options.images is 1 and setup.plants[$_type].icon>>
+			<img class="tending_icon" @src="`img/misc/icon/tending/` + setup.plants[$_type].icon">
+		<</if>>
+		<<number _tending_amount>>个<<print setup.plants[$_type].plural>>。
+	<</if>>
+<</widget>>
+
+<<widget "SG_tending_give">>
+	<<if _args[0]>>
+		<<set $_type to _args[0]>>
+		<<if $plants[$_type] is undefined>>
+			<<set $plants[$_type] to {"name": setup.plants[$_type].name, "plural": setup.plants[$_type].plural, "amount": 0}>>
+		<<elseif $plants[$_type].name is undefined>>
+			<<set $plants[$_type] to {"name": setup.plants[$_type].name, "plural": setup.plants[$_type].plural, "amount": $plants[$_type].amount}>>
+		<</if>>
+
+		<<set $plants[$_type].amount += (_args[1] ? _args[1] : 1)>>
+	<</if>>
+<</widget>>
+
+<<widget "SG_tending_season_notice">>
+	<<set $_plant to _args[0]>>
+	<span class="blue">
+		<<set $_seasons to formatList($_plant.season)>>
+		<<print $_plant.plural>>只能在<<print $_seasons.replace("autumn", "秋天").replace("winter", "冬天").replace("spring", "春天").replace("summer", "夏天").replace("and", "和")>>进行种植。
+	</span>
+<</widget>>

@@ -1,0 +1,8 @@
+		可访问地点<br>
+		<<if $first_visit_strangeGarden is undefined>>
+			<<elkicon>><<link [[破敗的工坊|strangeGarden]]>><</link>><br>
+		<<elseif $first_visit_strangeGarden is 1 and $strangeGarden_stage is 0>>
+			<<elkicon>><<link [[待銷售的破敗的工坊|strangeGarden]]>><</link>><br>
+		<<elseif $strangeGarden_stage is 1>>
+			<<elkicon>><<link [[屬於你的破敗的工坊|strangeGarden]]>><</link>><br>
+		<</if>>	

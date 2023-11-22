@@ -1,0 +1,48 @@
+{
+  "name": "strangeGarden",
+  "version": "0.7.0",
+  "styleFileList": [],
+  "scriptFileList": [],
+  "tweeFileList": [
+    "strangeGarden.twee",
+	"Widgets strangeGarden.twee",
+	"strangeGarden_Sex.twee",
+	"strangeGarden_Sex_Finish.twee",
+	"strangeGarden_buy.twee",
+	"strangeGarden_upgrade.twee"
+  ],
+  "imgFileList": [],
+  "additionFile": [
+    "readme.md",
+	"strangeGarden.twee",
+	"ELK_SG_display.txt"
+  ],
+  "addonPlugin": [
+    {
+      "modName": "TweeReplacer",
+      "addonName": "TweeReplacerAddon",
+      "modVersion": "1.0.0",
+      "params": [
+        {
+          "passage": "Elk Street",
+          "findString": "\t\t可访问地点",
+          "replaceFile": "ELK_SG_display.txt"
+        }
+      ]
+    }
+  ],
+  "dependenceInfo": [
+    {
+      "modName": "ModLoader",
+      "version": ">=1.1.0"
+    },
+    {
+      "modName": "TweeReplacer",
+      "version": ">=1.0.0"
+    },
+    {
+      "modName": "ReplacePatcher",
+      "version": ">=1.0.0"
+    }
+  ]
+}
