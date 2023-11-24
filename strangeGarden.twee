@@ -2,83 +2,11 @@
 <<effects>>
 <<SG_plot_effects>>
 
-<<if $first_visit_strangeGarden is undefined>>
-	<<set $first_visit_strangeGarden to 1>>
-	<<set $strangeGarden_stage to 0>>
-	<<generate1>>
-	<<person1>>
-	你站在大門前往裏頭張望<br>
-	裏頭有一大片雜草叢生的土地，以及一個綠油油長滿水草的池塘，旁邊一間破爛的工坊掛著歪歪斜斜的招牌，招牌的內容可以看出：這裡曾經生產著各式各樣的農產品，也許已經有許久沒人打理了。<br>
-	一個<<person>>突然靠近你，<<he>>說："這裡曾經是這個鎮上最大的農業工坊，但它的主人欠了一屁股債後跑路了，留下了這座工坊。現在債主們委託我們負責處理這座工坊，他們對經營工坊沒什麼興趣，打算變賣抵債。"<br>
-	<<he>>晃了晃手上的廣告單，標題寫著："老闆帶著小姨子跑路了，原價要<<printmoney 10000000>>的工坊現在跳樓大拍賣！只要<<printmoney 1000000>>！<br>
-	<<he>>接著說："如何?只要<<printmoney 1000000>>它能為你創造無數倍的利潤！很便宜的，買了吧！"<br>
-	面對這奇怪的推銷......，你<br>
-	<<if $money gte 1000000>>
-		<<link [[買下它|strangeGarden_buy]]>><<set $strangeGarden_stage to 1>><</link>><br>
-		<<link [[沒興趣|strangeGarden_buy]]>><</link>><br>
-	<<else>>
-		表示沒有足夠資金購買，<<he>>說："沒關係，在賣掉它之前我們隨時都在這"<br>
-		<<getouticon>><<link [[离开|Elk Street]]>><</link>>
-	<</if>>	
-<<elseif $strangeGarden_stage is 0 or undefined>>
-	你站在大門前往裏頭張望<br>
-	裏頭有一大片雜草叢生的土地，以及一個綠油油長滿水草的池塘，旁邊一間破爛的工坊掛著歪歪斜斜的招牌，招牌的內容可以看出：這裡曾經生產著各式各樣的農產品。<br>
-	你記得這裡正在便宜出售，看這破破爛爛的樣子應該還沒賣掉。<br>
-	<<generate1>>
-	<<person1>>
-	一個<<person>>靠近你，<<he>>說："這裡曾經是這個鎮上最大的農業工坊，但它的主人欠了一屁股債後跑路了，留下了這座工坊。現在債主們委託我們負責處理這座工坊，他們對經營工坊沒什麼興趣，打算變賣抵債。"<br>
-	<<he>>晃了晃手上的廣告單，標題寫著："老闆帶著小姨子跑路了，原價要<<printmoney 100000000>>的工坊現在跳樓大拍賣！只要<<printmoney 1000000>>！<br>
-	<<he>>接著說："我記得你，改變主意準備買下了嗎？如何?只要<<printmoney 1000000>>它能為你創造無數倍的利潤！很便宜的，買了吧！"<br>
-	面對這奇怪的推銷......，你<br>
-	<<if $money gte 1000000>>
-		<<link [[買下它|strangeGarden_buy]]>><<set $strangeGarden_stage to 1>><</link>><br>
-		<<link [[沒興趣|strangeGarden_buy]]>><</link>><br>
-	<<else>>
-		表示沒有足夠資金購買，<<he>>說："沒關係，在賣掉它之前我們隨時都在這"<br>
-		<<getouticon>><<link [[离开|Elk Street]]>><</link>>
-	<</if>>	
+<<if $strangeGarden_stage is undefined>>
+	<<first_visit_strangeGarden>>
+<<elseif $strangeGarden_stage is 0 >>
+	<<strangeGarden_stage 0>>
 <<elseif $strangeGarden_stage is 1 >>
-	<<if $init_strangeGarden is 1>> <!--首次獲得工坊初始化旗幟-->
-		<<unset $init_strangeGarden >>
-		<<set $SG_earth_upgrade to 0>><!--各設備擴充紀錄初始化-->
-		<<set $SG_water_upgrade to 0>>
-		<<set $SG_bird_nest_upgrade to 0>>
-		<<set $SG_wood_upgrade to 0>>
-		<<set $SG_hive_upgrade to 0>>
-		<<set $SG_cow_upgrade to 0>>
-		<<set $SG_human_upgrade to 0>>
-		<<set $SG_fertiliser to {current:0,used:0}>><!--工坊專用"肥料"數量初始化-->
-		<<plots_init strangeGarden 1 earth 1 small>><!--初始化工坊可使用設備(農田*1+水池*1)-->
-		<<add_plot strangeGarden water 1 small>>
-	<</if>>	
-	這裡是你購買的農業工坊，非常破敗，看得出已經很久沒使用了。<br>
-	目前土地雜草叢生，只有一小塊可供使用，一旁的水塘免強能使用。<br>
-	<<SG_display_plot strangeGarden>><br>
-	
-	<<if $SG_earth_upgrade lte 2 or $debug is 1>>
-		<<gardenicon "till">><<link [[開墾荒地(3:00)|strangeGarden_upgrade]]>><<pass 3 hours>><<set $SG_upgrade_type to 1>><</link>><br>
-	<</if>>	
-	<<if $SG_water_upgrade lte 2 or $debug is 1>>
-		<<gardenicon "till">><<link [[擴大池塘(3:00)|strangeGarden_upgrade]]>><<pass 3 hours>><<set $SG_upgrade_type to 2>><</link>><br>
-	<</if>>
-	<<if $SG_bird_nest_upgrade lte 2 or $debug is 1>>
-		<<gardenicon "till">><<link [[查看樹上的鳥巢(1:00)|strangeGarden_upgrade]]>><<pass 1 hours>><<set $SG_upgrade_type to 3>><</link>><br>
-	<</if>>
-	遠處工坊內似乎還有甚麼設備，不過布滿灰塵，零件散落四周，得好好整理一番。<br>
-	<<if $SG_wood_upgrade lte 2 or $debug is 1>>
-		<<gardenicon "till">><<link [[查看堆置的木頭(1:00)|strangeGarden_upgrade]]>><<pass 1 hours>><<add_plot strangeGarden wood 1 small>><<set $SG_upgrade_type to 4>><</link>><br>
-	<</if>>
-	<<if $SG_hive_upgrade lte 2 or $debug is 1>>
-		<<gardenicon "till">><<link [[查看散落的木箱(1:00)|strangeGarden_upgrade]]>><<pass 1 hours>><<set $SG_upgrade_type to 5>><</link>><br>
-	<</if>>
-	<br>
-	工坊深處放置了幾個可疑的板條箱，全都上鎖了，板條箱異常堅固，暴力破壞似乎行不通。<br>
-	<<if $SG_cow_upgrade lte 2 or $debug is 1>>
-		<<gardenicon "till">><<link [[查看上鎖的板條箱(1:00)|strangeGarden_upgrade]]>><<pass 1 hours>><<set $lock to 500>><<set $SG_upgrade_type to 6>><</link>><br>
-	<</if>>
-	<<if $SG_human_upgrade lte 2 or $debug is 1>>
-		<<gardenicon "till">><<link [[查看上鎖的板條箱(1:00)|strangeGarden_upgrade]]>><<pass 1 hours>><<set $lock to 600>><<set $SG_upgrade_type to 7>><</link>><br>
-	<</if>>
-	<<getouticon>><<link [[重新整理排序|strangeGarden_upgrade]]>><<set $SG_upgrade_refresh to 1>><</link>><br>
-	<<getouticon>><<link [[离开|Elk Street]]>><</link>>
+	<<init_strangeGarden>>	<!--首次獲得工坊初始化-->
+	<<strangeGarden_stage 1>>
 <</if>>

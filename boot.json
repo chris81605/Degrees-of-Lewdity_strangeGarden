@@ -9,7 +9,9 @@
 	"strangeGarden_Sex.twee",
 	"strangeGarden_Sex_Finish.twee",
 	"strangeGarden_buy.twee",
-	"strangeGarden_upgrade.twee"
+	"strangeGarden_upgrade.twee",
+	"Widgets strangeGarden.twee",
+	"Widgets strangeGarden_init.twee"
   ],
   "imgFileList": [],
   "additionFile": [
