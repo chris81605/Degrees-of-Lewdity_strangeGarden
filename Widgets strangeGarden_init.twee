@@ -56,6 +56,7 @@
 		<<elseif _args[0] is 1>>
 			這裡是你購買的農業工坊，非常破敗，看得出已經很久沒使用了。<br>
 			目前土地雜草叢生，只有一小塊可供使用，一旁的水塘免強能使用。<br>
+			<<SG_unlockplants>>
 			<<SG_display_plot strangeGarden>><br>
 	
 			<<if $SG_earth_upgrade lte 2 or $debug is 1>>
@@ -83,10 +84,48 @@
 				<<gardenicon "till">><<link [[查看上鎖的板條箱(1:00)|strangeGarden_upgrade]]>><<pass 1 hours>><<set $lock to 600>><<set $SG_upgrade_type to 7>><</link>><br>
 			<</if>>
 			<<getouticon>><<link [[重新整理排序|strangeGarden_upgrade]]>><<set $SG_upgrade_refresh to 1>><</link>><br>
-			<<getouticon>><<link [[离开|Elk Street]]>><</link>>
+			<<getouticon>><<link [[离开|Elk Street]]>><<hide_SG_plants_seed>><</link>>
 		<<else>>
 			<spen class = "red">出現錯誤！！！</spen><br>
 			<<link[[初始化|$passage]]>><<unset $first_visit_strangeGarden>> 	<<unset $strangeGarden_stage>><</link>>
-			<<getouticon>><<link [[离开|Elk Street]]>><</link>>
+			<<getouticon>><<link [[离开|Elk Street]]>><<hide_SG_plants_seed>><</link>>
 		<</if>>	
 	<</widget>>	
+	
+	<<widget "SG_unlockplants">>    <!--將持有的產品加入可種植項目-->
+	    <<set _SG_plant_seeds to Object.keys($plants)>><!--獲取現在持有的產品名稱-->
+	    <<set _plant_keys to Object.keys(setup.plants)>><!--獲取遊戲內所有產品資料-->
+	    <<if _SG_plant_seeds.length gt 0>><!--當現在持有的產品不在可種植列表時，加入可種植種子列表-->
+	        <<for _i to 0; _i lt _SG_plant_seeds.length; _i++>>
+	            <<for _j to 0; _j lt _plant_keys.length; _j++>>
+	                <<if _SG_plant_seeds[_i] is setup.plants[_plant_keys[_j]].name>>
+	                    <<if !$plants_known.includes(setup.plants[_plant_keys[_j]].name)>>
+	                        <<set $plants_known.pushUnique(setup.plants[_plant_keys[_j]].name)>>
+	                    <</if>>
+	                <</if>>   
+	            <</for>>       
+	        <</for>>
+	    <</if>>	    
+    <</widget>>
+    
+    <<widget "hide_SG_plants_seed">><!--將非植物產品從可種植項目移除-->
+	    <<set _plant_keys to Object.keys(setup.plants)>>
+	    <<for _i to 0; _i lt _plant_keys.length; _i++>>
+	        <<if setup.plants[_plant_keys[_i]].type isnot "flower" or setup.plants[_plant_keys[_i]].type isnot "vegetable">>
+		        <<if $plants_known.includes(setup.plants[_plant_keys[_i]].name)>>
+		            <<set $plants_known.delete(setup.plants[_plant_keys[_i]].name)>>
+		        <</if>>
+		    <</if>>
+	    <</for>>
+    <</widget>>
+    
+    <<widget "unlockplants">>
+	    <<set _plant_keys to Object.keys(setup.plants)>>
+	    <<for _i to 0; _i lt _plant_keys.length; _i++>>
+	        <<if setup.plants[_plant_keys[_i]].type is "flower" or setup.plants[_plant_keys[_i]].type is "vegetable">>
+		        <<set $plants_known.pushUnique(setup.plants[_plant_keys[_i]].name)>>
+		    <</if>>
+	    <</for>>
+    <</widget>>
+    
+    
