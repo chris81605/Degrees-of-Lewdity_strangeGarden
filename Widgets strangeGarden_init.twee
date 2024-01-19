@@ -122,7 +122,7 @@
     <<widget "unlockplants">>
 	    <<set _plant_keys to Object.keys(setup.plants)>>
 	    <<for _i to 0; _i lt _plant_keys.length; _i++>>
-	        <<if setup.plants[_plant_keys[_i]].type is "flower" or setup.plants[_plant_keys[_i]].type is "vegetable">>
+	        <<if setup.plants[_plant_keys[_i]].type is "flower" and setup.plants[_plant_keys[_i]].type is "vegetable">>
 		        <<set $plants_known.pushUnique(setup.plants[_plant_keys[_i]].name)>>
 		    <</if>>
 	    <</for>>
