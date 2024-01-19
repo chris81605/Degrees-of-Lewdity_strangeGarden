@@ -111,7 +111,7 @@
     <<widget "hide_SG_plants_seed">><!--將非植物產品從可種植項目移除-->
 	    <<set _plant_keys to Object.keys(setup.plants)>>
 	    <<for _i to 0; _i lt _plant_keys.length; _i++>>
-	        <<if setup.plants[_plant_keys[_i]].type isnot "flower" or setup.plants[_plant_keys[_i]].type isnot "vegetable">>
+	        <<if setup.plants[_plant_keys[_i]].type isnot "flower" and setup.plants[_plant_keys[_i]].type isnot "vegetable">>
 		        <<if $plants_known.includes(setup.plants[_plant_keys[_i]].name)>>
 		            <<set $plants_known.delete(setup.plants[_plant_keys[_i]].name)>>
 		        <</if>>
