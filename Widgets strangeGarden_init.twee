@@ -10,6 +10,8 @@
 			<<set $SG_hive_upgrade to 0>>
 			<<set $SG_cow_upgrade to 0>>
 			<<set $SG_human_upgrade to 0>>
+			<<set $SG_oyster_upgrade to 0>>
+			<<set $SG_chicken_upgrade to 0>>
 			<<set $SG_fertiliser to {current:0,used:0}>><!--工坊專用"肥料"數量初始化-->
 			<<plots_init strangeGarden 1 earth 1 small>><!--初始化工坊可使用設備(農田*1+水池*1)-->
 			<<add_plot strangeGarden water 1 small>>
@@ -65,8 +67,14 @@
 			<<if $SG_water_upgrade lte 2 or $debug is 1>>
 				<<gardenicon "till">><<link [[擴大池塘(3:00)|strangeGarden_upgrade]]>><<pass 3 hours>><<set $SG_upgrade_type to 2>><</link>><br>
 			<</if>>
+			<<if $SG_oyster_upgrade lte 2 or $debug is 1>>
+				<<gardenicon "till">><<link [[查看水塘邊的珍珠貝(1:00)|strangeGarden_upgrade]]>><<pass 1 hours>><<set $SG_upgrade_type to 8>><</link>><br>
+			<</if>>
 			<<if $SG_bird_nest_upgrade lte 2 or $debug is 1>>
 				<<gardenicon "till">><<link [[查看樹上的鳥巢(1:00)|strangeGarden_upgrade]]>><<pass 1 hours>><<set $SG_upgrade_type to 3>><</link>><br>
+			<</if>>
+			<<if $SG_chicken_upgrade lte 2 or $debug is 1>>
+				<<gardenicon "till">><<link [[查看田邊的雞窩(1:00)|strangeGarden_upgrade]]>><<pass 1 hours>><<set $SG_upgrade_type to 9>><</link>><br>
 			<</if>>
 			遠處工坊內似乎還有甚麼設備，不過布滿灰塵，零件散落四周，得好好整理一番。<br>
 			<<if $SG_wood_upgrade lte 2 or $debug is 1>>
@@ -119,12 +127,15 @@
 	    <</for>>
     <</widget>>
     
-    <<widget "unlockplants">>
+    <<widget "SG_unlockplants_all">>
 	    <<set _plant_keys to Object.keys(setup.plants)>>
 	    <<for _i to 0; _i lt _plant_keys.length; _i++>>
-	        <<if setup.plants[_plant_keys[_i]].type is "flower" and setup.plants[_plant_keys[_i]].type is "vegetable">>
+	    <!--
+	        <<if setup.plants[_plant_keys[_i]].type is "flower" or setup.plants[_plant_keys[_i]].type is "vegetable">>
 		        <<set $plants_known.pushUnique(setup.plants[_plant_keys[_i]].name)>>
 		    <</if>>
+		-->    
+		    <<set $plants_known.pushUnique(setup.plants[_plant_keys[_i]].name)>>
 	    <</for>>
     <</widget>>
     

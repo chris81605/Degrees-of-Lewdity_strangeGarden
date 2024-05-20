@@ -72,8 +72,10 @@
 		<<case "wood">><<set _bedType to "木頭">>
 		<<case "hive">><<set _bedType to "蜂箱">>
 		<<case "cow">><<set _bedType to "長得像奶牛乳房的奇怪物體">>
-		<<case "bird_nest">><<set _bedType to "奇怪的鳥巢">>
+		<<case "bird_nest">><<set _bedType to "樹上的鳥巢">>
 		<<case "human">><<set _bedType to "長得像人的奇怪物體">>
+		<<case "oyster">><<set _bedType to "水塘邊的珍珠貝">>
+		<<case "chicken">><<set _bedType to "田邊的放山雞">>
 		<<default>><<set _bedType to clone($_plot.bed)>>
 	<</switch>>
 	<<if $_plot.bed is "wood">>
@@ -108,6 +110,14 @@
 			<<case 4>><<set $_result to `<span class="green">無數個`+_bedType+`</span>`>>
 			<<default>> <<set $_result to `<span class="red">错误</span>`>>
 		<</switch>>
+	<<elseif $_plot.bed is "chicken">>
+		<<switch Math.clamp($_plot.quality, 0, 4)>>
+			<<case 1>> <<set $_result to `<span class="blue">一隻`+_bedType+`</span>`>>
+			<<case 2>> <<set $_result to `<span class="lblue">幾隻`+_bedType+`</span>`>>
+			<<case 3>> <<set $_result to `<span class="teal">很多隻`+_bedType+`</span>`>>
+			<<case 4>><<set $_result to `<span class="green">無數隻`+_bedType+`</span>`>>
+			<<default>> <<set $_result to `<span class="red">错误</span>`>>
+		<</switch>>	
 	<<elseif $_plot.bed is "human">>
 		<<switch Math.clamp($_plot.quality, 0, 4)>>
 			<<case 1>> <<set $_result to `<span class="blue">_bedType</span>`>>
@@ -115,7 +125,15 @@
 			<<case 3>> <<set $_result to `<span class="teal">良好的`+_bedType+`</span>`>>
 			<<case 4>><<set $_result to `<span class="green">優良的`+_bedType+`</span>`>>
 			<<default>> <<set $_result to `<span class="red">错误</span>`>>
-		<</switch>>	
+		<</switch>>
+	<<elseif $_plot.bed is "oyster">>
+		<<switch Math.clamp($_plot.quality, 0, 4)>>
+			<<case 1>> <<set $_result to `<span class="blue">_bedType</span>`>>
+			<<case 2>> <<set $_result to `<span class="lblue">普通的`+_bedType+`</span>`>>
+			<<case 3>> <<set $_result to `<span class="teal">良好的`+_bedType+`</span>`>>
+			<<case 4>><<set $_result to `<span class="green">優良的`+_bedType+`</span>`>>
+			<<default>> <<set $_result to `<span class="red">错误</span>`>>
+		<</switch>>			
 	<<else>>
 		<<switch Math.clamp($_plot.quality, 0, 4)>>
 			<<case 1>> <<set $_result to `<span class="blue">贫瘠的`+_bedType+`</span>`>>
@@ -162,6 +180,10 @@
 					<span class="green">這裡生產<<print $_plantedPlant.plural>>奶牛的乳房膨脹到極限了，乳汁正順著乳頭滴落，可以擠奶了。</span>
 				<<elseif $_plot.bed is "bird_nest">>
 					<span class="green">鳥巢裡生產<<print $_plantedPlant.plural>>，現在裏頭有許多<<print $_plantedPlant.plural>>。</span>
+				<<elseif $_plot.bed is "chicken">>
+					<span class="green">雞窩裡生產<<print $_plantedPlant.plural>>，現在裏頭有許多<<print $_plantedPlant.plural>>。</span>	
+				<<elseif $_plot.bed is "oyster">>
+					<span class="green">珍珠貝裡生產<<print $_plantedPlant.plural>>，現在裏頭有許多<<print $_plantedPlant.plural>>。</span>	
 				<<elseif $_plot.bed is "human">>
 					<<if $_plantedPlant.plural is "小瓶装母乳" or $_plantedPlant.plural is "瓶装母乳">>
 						<span class="green">像人的奇怪物體的乳房膨脹到極限了，乳汁正順著乳頭滴落，可以擠奶了。</span>
@@ -197,6 +219,10 @@
 					<span class="teal">這裡生產<<print $_plantedPlant.plural>>奶牛的乳房正在膨脹，現在有一定規模了，即將產奶。</span>
 				<<elseif $_plot.bed is "bird_nest">>
 					<span class="teal">鳥巢裡生產<<print $_plantedPlant.plural>>，現在裏頭沒有蛋，也許快有了。</span>
+				<<elseif $_plot.bed is "chicken">>
+					<span class="green">雞窩裡生產<<print $_plantedPlant.plural>>，現在裏頭沒有蛋，也許快有了。</span>	
+				<<elseif $_plot.bed is "oyster">>
+					<span class="green">珍珠貝裡生產<<print $_plantedPlant.plural>>，現在裏頭有一些<<print $_plantedPlant.plural>>。</span>	
 				<<elseif $_plot.bed is "human">>
 					<<if $_plantedPlant.plural is "小瓶装母乳" or $_plantedPlant.plural is "瓶装母乳">>
 						<span class="teal">像人的奇怪物體的乳房正在膨脹，現在有一定規模了，即將產奶。</span>
@@ -215,6 +241,10 @@
 					<span class="lblue">這裡生產<<print $_plantedPlant.plural>>奶牛的乳房正在膨脹。</span>
 				<<elseif $_plot.bed is "bird_nest">>
 					<span class="lblue">鳥巢裡生產<<print $_plantedPlant.plural>>，現在裏頭沒有蛋。</span>
+				<<elseif $_plot.bed is "chicken">>
+					<span class="green">雞窩裡生產<<print $_plantedPlant.plural>>，現在裏頭沒有蛋，也許快有了。</span>	
+				<<elseif $_plot.bed is "oyster">>
+					<span class="green">珍珠貝裡生產<<print $_plantedPlant.plural>>，現在裏頭有幾個<<print $_plantedPlant.plural>>。</span>	
 				<<elseif $_plot.bed is "human">>
 					<<if $_plantedPlant.plural is "小瓶装母乳" or $_plantedPlant.plural is "瓶装母乳">>
 						<span class="lblue">像人的奇怪物體的乳房正在膨脹。</span>
@@ -233,6 +263,10 @@
 					<span class="blue">這裡生產<<print $_plantedPlant.plural>>奶牛的乳房似乎有點膨脹。</span>
 				<<elseif $_plot.bed is "bird_nest">>
 					<span class="blue">鳥巢裡生產<<print $_plantedPlant.plural>>，現在裏頭沒有蛋。</span>
+				<<elseif $_plot.bed is "chicken">>
+					<span class="green">雞窩裡生產<<print $_plantedPlant.plural>>，現在裏頭沒有蛋，也許快有了。</span>	
+				<<elseif $_plot.bed is "oyster">>
+					<span class="green">珍珠貝裡生產<<print $_plantedPlant.plural>>，現在裏頭有一點像<<print $_plantedPlant.plural>>。的東西</span>	
 				<<elseif $_plot.bed is "human">>
 					<<if $_plantedPlant.plural is "小瓶装母乳" or $_plantedPlant.plural is "瓶装母乳">>
 						<span class="blue">像人的奇怪物體的乳房似乎有點膨脹。</span>
@@ -251,6 +285,10 @@
 					<span class="blue">這裡準備生產<<print $_plantedPlant.plural>>。</span>
 				<<elseif $_plot.bed is "bird_nest">>
 					<span class="blue">鳥巢裡準備生產<<print $_plantedPlant.plural>>。</span>
+				<<elseif $_plot.bed is "chicken">>
+					<span class="blue">雞窩裡準備生產<<print $_plantedPlant.plural>>。</span>	
+				<<elseif $_plot.bed is "oyster">>
+					<span class="green">珍珠貝裡準備生產<<print $_plantedPlant.plural>>。</span>	
 				<<elseif $_plot.bed is "human">>
 					<<if $_plantedPlant.plural is "小瓶装母乳" or $_plantedPlant.plural is "瓶装母乳">>
 						<span class="blue">像人的奇怪物體長出了乳房。</span>
@@ -321,6 +359,24 @@
 						<br>
 						<<SG_tendingWaterPlot _plantbed>>
 					<</if>>
+				<<elseif _plantbed.bed is "chicken">>
+					<<if _plantbed.water is 1>>
+						<span class="green"><<print (_plantbed.bed is "large" ? "雞窩" : "雞窩")>>已經打掃乾淨，並提供必要的食物與水。</span>
+						<br>
+					<<else>>	
+						<span class="purple"><<print (_plantbed.bed is "large" ? "雞窩" : "雞窩")>>尚未清理。</span>
+						<br>
+						<<SG_tendingWaterPlot _plantbed>>
+					<</if>>	
+				<<elseif _plantbed.bed is "oyster">>
+					<<if _plantbed.water is 1>>
+						<span class="green"><<print (_plantbed.bed is "large" ? "珍珠貝" : "珍珠貝")>>已經給它一些食物。</span>
+						<br>
+					<<else>>	
+						<span class="purple"><<print (_plantbed.bed is "large" ? "珍珠貝" : "珍珠貝")>>尚未餵食。</span>
+						<br>
+						<<SG_tendingWaterPlot _plantbed>>
+					<</if>>	
 				<<elseif _plantbed.bed is "human">>
 					<<if _plantbed.water is 1>>
 						<span class="green"><<print (_plantbed.bed is "large" ? "人形的奇怪物體" : "人形的奇怪物體")>>已經清理乾淨了。</span>
@@ -428,7 +484,7 @@
 					<span class="orange">(<<print $_plant.days>>天)</span>
 				<</if>>
 			<<else>>
-				<span class="blue"><<print $_plant.plural>>仅能于<<print $_plant.bed.replace("earth","土地里").replace("water","水池中").replace("wood","木頭上").replace("hive","蜂箱裡").replace("cow","長得像奶牛乳房的奇怪物體上").replace("bird_nest","奇怪的鳥巢中").replace("human","長得像人的奇怪物體裡")>>生產。</span>
+				<span class="blue"><<print $_plant.plural>>仅能于<<print $_plant.bed.replace("earth","土地里").replace("water","水池中").replace("wood","木頭上").replace("hive","蜂箱裡").replace("cow","長得像奶牛乳房的奇怪物體上").replace("bird_nest","奇怪的鳥巢中").replace("human","長得像人的奇怪物體裡")replace("chicken","雞窩裡")replace("oyster","水塘邊的珍珠貝")>>生產。</span>
 			<</if>>
 		<<else>>
 			<<tending_season_notice $_plant>>

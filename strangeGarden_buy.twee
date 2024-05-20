@@ -7,11 +7,11 @@
 					你對這個要求感到些興趣<span class='green'>- 壓力</span><<stress - 10>><br>
 					<<link [[答應|strangeGarden_Sex]]>><span class='red'>+ 淫亂</span><<set $promiscuity +=5>><<set $sexstart to 1>><<set $money -=500000>><<set $init_strangeGarden to 1>><</link>><br>
 					<<link [[不答應，轉身離開|Elk Street]]>><<set $strangeGarden_stage to 0>><</link>><br>
-					<<link [[不答應，直接支付|strangeGarden_buy]]>><<set $money -=1000000>><<set $SG_phase to 1>><</link>>
+					<<link [[不答應，直接支付|strangeGarden_buy]]>><<set $SG_phase to 1>><</link>>
 				<<else>>
 					你對這個要求感到不安<span class='red'>+壓力</span><<stress + 10>><br>	
 					<<link [[不答應，轉身離開|Elk Street]]>><<set $strangeGarden_stage to 0>><</link>><br>
-					<<link [[不答應，直接支付|strangeGarden_buy]]>><<set $money -=1000000>><<set $SG_phase to 1>><<set $init_strangeGarden to 1>><</link>>
+					<<link [[不答應，直接支付|strangeGarden_buy]]>><<set $SG_phase to 1>><</link>>
 				<</if>>	
 		<<else>>
 			<<set $money -=1000000>>

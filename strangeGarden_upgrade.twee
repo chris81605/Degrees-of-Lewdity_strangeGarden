@@ -75,7 +75,17 @@
 			板條箱內裝了個奇怪的東西，看起來......<span class="blue">有著人類外型</span>，摸起來非常有彈性，現在有些乾癟，板條箱內還有其他零件，及使用說明。<br>
 			說明書上寫著按圖組裝後，即可投入生產，雖然不明白到底如何生產，反正先組裝起來再說。<br>
 			<<getouticon>><<link [[离开|strangeGarden]]>><</link>>
-		<</if>>	
+		<</if>>
+    <<elseif $SG_upgrade_type is 8>>
+		<<set $SG_oyster_upgrade +=1>>
+		<<add_plot strangeGarden oyster 1 small>>
+		你無聊的敲開水塘邊的珍珠貝，並往裡頭灌了點砂。<<tiredness 1>><<physique 1>><<gtiredness>><<gphysique>><br>
+		<<getouticon>><<link [[离开|strangeGarden]]>><</link>>
+	<<elseif $SG_upgrade_type is 9>>
+		<<set $SG_oyster_upgrade +=1>>
+		<<add_plot strangeGarden oyster 1 small>>
+		田邊有個雞窩，也許好好照料裡頭的雞牠們能給你提供一些雞蛋？<<tiredness 1>><<physique 1>><<gtiredness>><<gphysique>><br>
+		<<getouticon>><<link [[离开|strangeGarden]]>><</link>>			
 	<</if>>	
 <<elseif $SG_upgrade_refresh is 1>>
 	<<unset $SG_upgrade_refresh>>
@@ -87,8 +97,14 @@
 	<<for _j to 0; _j lt $SG_water_upgrade; _j++>>
 		<<add_plot strangeGarden water 1 small>>
 	<</for>>
+	<<for _k to 0; _k lt $SGoyster_upgrade; _k++>>
+		<<add_plot strangeGarden oyster 1 small>>
+	<</for>>
 	<<for _k to 0; _k lt $SG_bird_nest_upgrade; _k++>>
 		<<add_plot strangeGarden bird_nest 1 small>>
+	<</for>>
+	<<for _k to 0; _k lt $SG_chickenupgrade; _k++>>
+		<<add_plot strangeGarden chicken 1 small>>
 	<</for>>
 	<<for _l to 0; _l lt $SG_wood_upgrade; _l++>>	
 		<<add_plot strangeGarden wood 1 small>>
