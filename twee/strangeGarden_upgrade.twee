@@ -1,0 +1,122 @@
+:: strangeGarden_upgrade
+<<set $outside to 1>>
+<<if $SG_upgrade_refresh is undefined>>
+	<<if  $SG_upgrade_type is 1>>
+		<<set $SG_earth_upgrade += 1>>
+		<<add_plot strangeGarden earth 1 small>>
+		你正在努里清除雜草，雜草叢生，你費了一番功夫終於整理出一塊可供種植的土地。<<tiredness 3>><<physique 2>><<gtiredness>><<gphysique>><br>
+		<<getouticon>><<link [[离开|strangeGarden]]>><</link>>
+	<<elseif $SG_upgrade_type is 2>>
+		<<set $SG_water_upgrade +=1>>
+		<<add_plot strangeGarden water 1 small>>
+		你正在努力開挖池塘不是簡單的事，你費了一番功夫終於挖了個池塘出來。<<tiredness 3>><<physique 2>><<gtiredness>><<gphysique>><br>
+		<<getouticon>><<link [[离开|strangeGarden]]>><</link>>
+	<<elseif $SG_upgrade_type is 3>>	
+		<<set $SG_bird_nest_upgrade += 1>>
+		<<add_plot strangeGarden bird_nest 1 small>>
+		你發現樹上有許多地方可以放鳥屋供鳥類築巢，你小心地爬上樹，將在工坊內找到的鳥屋固定在合適的地方。<<tiredness 1>><<physique 1>><<gtiredness>><<gphysique>><br>
+		<<getouticon>><<link [[离开|strangeGarden]]>><</link>>
+	<<elseif $SG_upgrade_type is 4>>	
+		<<set $SG_wood_upgrade += 1>>
+		<<add_plot strangeGarden wood 1 small>>
+		工坊內有許多木頭，也許能拿來種香菇？你將這些木頭放在陰涼潮濕的位製。<br>
+		<<getouticon>><<link [[离开|strangeGarden]]>><</link>>
+	<<elseif $SG_upgrade_type is 5>>	
+		<<set $SG_hive_upgrade += 1>>
+		<<add_plot strangeGarden hive 1 small>>
+		工坊內有許多空的木箱，也許能拿來養野蜂？經過一番修整，終於做出一個蜂箱，只需要放在合適的位置就好。<br>
+		<<getouticon>><<link [[离开|strangeGarden]]>><</link>>
+	<<elseif $SG_upgrade_type is 6>>	
+		<<if currentSkillValue('skulduggery') gte $lock and $SG_unlock is undefined>>
+			你翻出一個沉甸甸的板條箱，<span class="green">它的鎖看起來不難撬開</span>，你很想知道里頭到底放了些甚麼。<<tiredness 1>><<gtiredness>><br>
+			<<link [[撬锁 (0:05)|strangeGarden_upgrade]]>><<pass 5>><<set $SG_unlock to 1>><</link>>
+		<<elseif currentSkillValue('skulduggery') lt $lock>>
+			你翻出一個沉甸甸的板條箱，<span class="red">它的鎖看起來不是你能撬開的</span>，只好又再把它放回去。<<skulduggeryrequired>><<tiredness 1>><<gtiredness>><br>
+			<<getouticon>><<link [[离开|strangeGarden]]>><</link>>
+		<<elseif $SG_unlock is 1 >>	
+			<<set $SG_cow_upgrade += 1>>
+			<<unset $SG_unlock>>
+			<<add_plot strangeGarden cow 1 small>>
+			<<set _plant_keys to Object.keys($plants)>>
+			<<if _plant_keys.length gt 0>>
+				<<for _t to 0; _t lt _plant_keys.length; _t++>>
+						<<if $plants[_plant_keys[_t]].amount gte 1>>
+							<<if !$plants_known.includes(_plant_keys[_t])>>
+								<<set $plants_known.push(_plant_keys[_t])>>
+							<</if>>
+						<</if>>	
+				<</for>>
+			<</if>>	
+			板條箱內裝了個奇怪的東西，看起來......<span class="blue">有點像奶牛的乳房</span>，摸起來非常有彈性，現在有些乾癟，板條箱內還有其他零件，及使用說明。<br>
+			說明書上寫著按圖組裝後，即可投入生產，雖然不明白到底如何生產，反正先組裝起來再說。<br>
+			<<getouticon>><<link [[离开|strangeGarden]]>><</link>>
+		<</if>>	
+	<<elseif $SG_upgrade_type is 7>>	
+		<<if currentSkillValue('skulduggery') gte $lock and $SG_unlock is undefined>>
+			你翻出一個異常沉重的板條箱，<span class="green">它的鎖看起來不難撬開</span>，你很想知道里頭到底放了些甚麼。<<tiredness 2>><<gtiredness>><br>
+			<<link [[撬锁 (0:05)|strangeGarden_upgrade]]>><<pass 5>><<set $SG_unlock to 1>><</link>>
+		<<elseif currentSkillValue('skulduggery') lt $lock>>
+			你翻出一個異常沉重的板條箱，<span class="red">它的鎖看起來不是你能撬開的</span>，只好又再把它放回去。<<skulduggeryrequired>><<tiredness 1>><<gtiredness>><br>
+			<<getouticon>><<link [[离开|strangeGarden]]>><</link>>
+		<<elseif $SG_unlock is 1 >>	
+			<<set $SG_human_upgrade += 1>>
+			<<unset $SG_unlock>>
+			<<add_plot strangeGarden human 1 small>>
+			<<set _plant_keys to Object.keys($plants)>>
+			<<if _plant_keys.length gt 0>>
+				<<for _t to 0; _t lt _plant_keys.length; _t++>>
+						<<if $plants[_plant_keys[_t]].amount gte 1>>
+							<<if !$plants_known.includes(_plant_keys[_t])>>
+								<<set $plants_known.push(_plant_keys[_t])>>
+							<</if>>
+						<</if>>	
+				<</for>>
+			<</if>>	
+			板條箱內裝了個奇怪的東西，看起來......<span class="blue">有著人類外型</span>，摸起來非常有彈性，現在有些乾癟，板條箱內還有其他零件，及使用說明。<br>
+			說明書上寫著按圖組裝後，即可投入生產，雖然不明白到底如何生產，反正先組裝起來再說。<br>
+			<<getouticon>><<link [[离开|strangeGarden]]>><</link>>
+		<</if>>
+    <<elseif $SG_upgrade_type is 8>>
+		<<set $SG_oyster_upgrade +=1>>
+		<<add_plot strangeGarden oyster 1 small>>
+		你無聊的敲開水塘邊的珍珠貝，並往裡頭灌了點砂。<<tiredness 1>><<physique 1>><<gtiredness>><<gphysique>><br>
+		<<getouticon>><<link [[离开|strangeGarden]]>><</link>>
+	<<elseif $SG_upgrade_type is 9>>
+		<<set $SG_chicken_upgrade +=1>>
+		<<add_plot strangeGarden chicken 1 small>>
+		田邊有個雞窩，也許好好照料裡頭的雞牠們能給你提供一些雞蛋？<<tiredness 1>><<physique 1>><<gtiredness>><<gphysique>><br>
+		<<getouticon>><<link [[离开|strangeGarden]]>><</link>>			
+	<</if>>	
+<<elseif $SG_upgrade_refresh is 1>>
+	<<unset $SG_upgrade_refresh>>
+	<<plots_init strangeGarden 1 earth 1 small>>
+	<<for _i to 0; _i lt $SG_earth_upgrade; _i++>>
+		<<add_plot strangeGarden earth 1 small>>
+	<</for>>
+	<<add_plot strangeGarden water 1 small>>
+	<<for _j to 0; _j lt $SG_water_upgrade; _j++>>
+		<<add_plot strangeGarden water 1 small>>
+	<</for>>
+	<<for _k to 0; _k lt $SG_oyster_upgrade; _k++>>
+		<<add_plot strangeGarden oyster 1 small>>
+	<</for>>
+	<<for _k to 0; _k lt $SG_bird_nest_upgrade; _k++>>
+		<<add_plot strangeGarden bird_nest 1 small>>
+	<</for>>
+	<<for _k to 0; _k lt $SG_chicken_upgrade; _k++>>
+		<<add_plot strangeGarden chicken 1 small>>
+	<</for>>
+	<<for _l to 0; _l lt $SG_wood_upgrade; _l++>>	
+		<<add_plot strangeGarden wood 1 small>>
+	<</for>>	
+	<<for _m to 0; _m lt $SG_hive_upgrade; _m++>>
+		<<add_plot strangeGarden hive 1 small>>
+	<</for>>
+	<<for _n to 0; _n lt $SG_cow_upgrade; _n++>>	
+		<<add_plot strangeGarden cow 1 small>>
+	<</for>>
+	<<for _o to 0; _o lt $SG_human_upgrade; _o++>>	
+		<<add_plot strangeGarden human 1 small>>
+	<</for>>
+	<<getouticon>><<link [[离开|strangeGarden]]>><</link>>	
+<</if>>	

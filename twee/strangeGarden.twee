@@ -1,0 +1,12 @@
+:: strangeGarden
+<<effects>>
+<<SG_plot_effects>>
+
+<<if $strangeGarden_stage is undefined>>
+	<<first_visit_strangeGarden>>
+<<elseif $strangeGarden_stage is 0 >>
+	<<strangeGarden_stage 0>>
+<<elseif $strangeGarden_stage is 1 >>
+	<<init_strangeGarden>>	<!--首次獲得工坊初始化-->
+	<<strangeGarden_stage 1>>
+<</if>>
