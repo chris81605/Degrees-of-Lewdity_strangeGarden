@@ -9,7 +9,7 @@
 # 需求  
 * 需要搭配[MODLOADER][JML]使用  
 * 需搭配[Degrees of Lewdity 中文本地化][DOLCN]使用  
-
+* 需搭配[Simple Framework][SF]使用  
 
 
 # 萬物皆可種農場  
@@ -18,6 +18,9 @@
   * 在工業區增加一個可以生產任何商品的生產基地。
   
 # 更新日誌 
+**0.9**  
+* 使用`simpleframwork`實現新增地點功能，0.9版起需要[Simple Framework][SF]為前置需求  
+
 **0.8.4**  
 * 新增可種植珍珠的設備 （需求遊戲本體0.4.6.7+） 
 * 新增可生產雞蛋的設備 （需求遊戲本體0.4.6.7+） 
@@ -67,3 +70,4 @@
 [discord]: https://discord.gg/VznUtEh
 [JML]:https://github.com/Lyoko-Jeremie/sugarcube-2-ModLoader  
 [DOLCN]:https://github.com/Eltirosto/Degrees-of-Lewdity-Chinese-Localization  
+[SF]:https://github.com/emicoto/DOLMods

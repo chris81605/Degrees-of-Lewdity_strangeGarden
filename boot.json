@@ -1,37 +1,24 @@
 {
   "name": "StrangeGarden",
-  "version": "0.8.4",
+  "version": "0.9.0",
   "styleFileList": [],
   "scriptFileList": [],
   "tweeFileList": [
-    "strangeGarden.twee",
-    "strangeGarden_buy.twee",
-    "strangeGarden_Sex.twee",
-    "strangeGarden_Sex_Finish.twee",
-    "Widgets strangeGarden_init.twee",
-    "strangeGarden_upgrade.twee",
-    "Widgets strangeGarden.twee"
+    "twee/strangeGarden_Sex_Finish.twee",
+    "twee/strangeGarden_Sex.twee",
+    "twee/strangeGarden.twee",
+    "twee/Widgets strangeGarden.twee",
+    "twee/Widgets strangeGarden_init.twee",
+    "twee/strangeGarden_upgrade.twee",
+    "twee/strangeGarden_buy.twee"
   ],
   "imgFileList": [],
+  "scriptFileList_inject_early": [
+    "js/stg.js"
+  ],
   "additionFile": [
     "readme.md",
-    "strangeGarden.twee",
-    "ELK_SG_display.txt",
     "LICENSE.txt"
-  ],
-  "addonPlugin": [
-    {
-      "modName": "TweeReplacer",
-      "addonName": "TweeReplacerAddon",
-      "modVersion": "1.0.0",
-      "params": [
-        {
-          "passage": "Elk Street",
-          "findString": "\t\t可访问地点",
-          "replaceFile": "ELK_SG_display.txt"
-        }
-      ]
-    }
   ],
   "dependenceInfo": [
     {
@@ -45,6 +32,10 @@
     {
       "modName": "ReplacePatcher",
       "version": ">=1.0.0"
+    },
+    {
+      "modName": "Simple Frameworks",
+      "version": ">=1.3.0"
     }
   ]
 }
