@@ -1,25 +1,25 @@
 {
   "name": "StrangeGarden",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "styleFileList": [],
   "scriptFileList": [],
+  "scriptFileList_inject_early": [
+    "js/stg.js"],
   "tweeFileList": [
-    "twee/strangeGarden_Sex_Finish.twee",
-    "twee/strangeGarden_Sex.twee",
     "twee/strangeGarden.twee",
-    "twee/Widgets strangeGarden.twee",
+    "twee/strangeGarden_buy.twee",
+    "twee/strangeGarden_Sex.twee",
+    "twee/strangeGarden_Sex_Finish.twee",
     "twee/Widgets strangeGarden_init.twee",
     "twee/strangeGarden_upgrade.twee",
-    "twee/strangeGarden_buy.twee"
+    "twee/Widgets strangeGarden.twee"
   ],
   "imgFileList": [],
-  "scriptFileList_inject_early": [
-    "js/stg.js"
-  ],
   "additionFile": [
     "readme.md",
     "LICENSE.txt"
   ],
+  "addonPlugin": [],
   "dependenceInfo": [
     {
       "modName": "ModLoader",
