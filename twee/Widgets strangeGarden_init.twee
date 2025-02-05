@@ -12,6 +12,9 @@
 			<<set $SG_human_upgrade to 0>>
 			<<set $SG_oyster_upgrade to 0>>
 			<<set $SG_chicken_upgrade to 0>>
+			<<set $SG_kitchen_upgrade to 0>>
+			<<set $SG_river_upgrade to 0>>
+			<<set $SG_sea_upgrade to 0>>
 			<<set $SG_fertiliser to {current:0,used:0}>><!--工坊專用"肥料"數量初始化-->
 			<<plots_init strangeGarden 1 earth 1 small>><!--初始化工坊可使用設備(農田*1+水池*1)-->
 			<<add_plot strangeGarden water 1 small>>
@@ -103,6 +106,15 @@
 			<</if>>
 			<<if $SG_human_upgrade lte 2 or $debug is 1>>
 				<<gardenicon "till">><<link [[查看上鎖的板條箱(1:00)|strangeGarden_upgrade]]>><<pass 1 hours>><<set $lock to 600>><<set $SG_upgrade_type to 7>><</link>><br>
+			<</if>>
+			<<if $SG_kitchen_upgrade lte 2 or $debug is 1>>
+				<<gardenicon "till">><<link [[查看上鎖的板條箱(1:00)|strangeGarden_upgrade]]>><<pass 1 hours>><<set $lock to 600>><<set $SG_upgrade_type to 10>><</link>><br>
+			<</if>>
+			<<if $SG_river_upgrade lte 2 or $debug is 1>>
+				<<gardenicon "till">><<link [[查看上鎖的板條箱(1:00)|strangeGarden_upgrade]]>><<pass 1 hours>><<set $lock to 600>><<set $SG_upgrade_type to 11>><</link>><br>
+			<</if>>
+			<<if $SG_sea_upgrade lte 2 or $debug is 1>>
+				<<gardenicon "till">><<link [[查看上鎖的板條箱(1:00)|strangeGarden_upgrade]]>><<pass 1 hours>><<set $lock to 600>><<set $SG_upgrade_type to 12>><</link>><br>
 			<</if>>
 			<<getouticon>><<link [[重新整理排序|strangeGarden_upgrade]]>><<set $SG_upgrade_refresh to 1>><</link>><br>
 			<<getouticon>><<link [[离开|Elk Street]]>><<hide_SG_plants_seed>><</link>>

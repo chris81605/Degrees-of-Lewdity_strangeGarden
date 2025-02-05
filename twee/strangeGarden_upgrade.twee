@@ -86,6 +86,81 @@
 		<<add_plot strangeGarden chicken 1 small>>
 		田邊有個雞窩，也許好好照料裡頭的雞牠們能給你提供一些雞蛋？<<tiredness 1>><<physique 1>><<gtiredness>><<gphysique>><br>
 		<<getouticon>><<link [[离开|strangeGarden]]>><</link>>			
+	<<elseif $SG_upgrade_type is 10>>	
+		<<if currentSkillValue('skulduggery') gte $lock and $SG_unlock is undefined>>
+			你翻出一個異常沉重的板條箱，<span class="green">它的鎖看起來不難撬開</span>，你很想知道里頭到底放了些甚麼。<<tiredness 2>><<gtiredness>><br>
+			<<link [[撬锁 (0:05)|strangeGarden_upgrade]]>><<pass 5>><<set $SG_unlock to 1>><</link>>
+		<<elseif currentSkillValue('skulduggery') lt $lock>>
+			你翻出一個異常沉重的板條箱，<span class="red">它的鎖看起來不是你能撬開的</span>，只好又再把它放回去。<<skulduggeryrequired>><<tiredness 1>><<gtiredness>><br>
+			<<getouticon>><<link [[离开|strangeGarden]]>><</link>>
+		<<elseif $SG_unlock is 1 >>	
+			<<set $SG_kitchen_upgrade += 1>>
+			<<unset $SG_unlock>>
+			<<add_plot strangeGarden kitchen 1 small>>
+			<<set _plant_keys to Object.keys($plants)>>
+			<<if _plant_keys.length gt 0>>
+				<<for _t to 0; _t lt _plant_keys.length; _t++>>
+						<<if $plants[_plant_keys[_t]].amount gte 1>>
+							<<if !$plants_known.includes(_plant_keys[_t])>>
+								<<set $plants_known.push(_plant_keys[_t])>>
+							<</if>>
+						<</if>>	
+				<</for>>
+			<</if>>	
+			板條箱內裝了台奇特的設備，板條箱內還有其他零件，及使用說明。<br>
+			說明書上寫著按圖組裝後，即可投入生產，雖然不明白到底如何生產，反正先組裝起來再說。<br>
+			<<getouticon>><<link [[离开|strangeGarden]]>><</link>>
+		<</if>>
+	<<elseif $SG_upgrade_type is 11>>	
+		<<if currentSkillValue('skulduggery') gte $lock and $SG_unlock is undefined>>
+			你翻出一個異常沉重的板條箱，<span class="green">它的鎖看起來不難撬開</span>，你很想知道里頭到底放了些甚麼。<<tiredness 2>><<gtiredness>><br>
+			<<link [[撬锁 (0:05)|strangeGarden_upgrade]]>><<pass 5>><<set $SG_unlock to 1>><</link>>
+		<<elseif currentSkillValue('skulduggery') lt $lock>>
+			你翻出一個異常沉重的板條箱，<span class="red">它的鎖看起來不是你能撬開的</span>，只好又再把它放回去。<<skulduggeryrequired>><<tiredness 1>><<gtiredness>><br>
+			<<getouticon>><<link [[离开|strangeGarden]]>><</link>>
+		<<elseif $SG_unlock is 1 >>	
+			<<set $SG_river_upgrade += 1>>
+			<<unset $SG_unlock>>
+			<<add_plot strangeGarden river 1 small>>
+			<<set _plant_keys to Object.keys($plants)>>
+			<<if _plant_keys.length gt 0>>
+				<<for _t to 0; _t lt _plant_keys.length; _t++>>
+						<<if $plants[_plant_keys[_t]].amount gte 1>>
+							<<if !$plants_known.includes(_plant_keys[_t])>>
+								<<set $plants_known.push(_plant_keys[_t])>>
+							<</if>>
+						<</if>>	
+				<</for>>
+			<</if>>	
+			板條箱內裝了台奇特的設備，板條箱內還有其他零件，及使用說明。<br>
+			說明書上寫著按圖組裝後，即可投入生產，雖然不明白到底如何生產，反正先組裝起來再說。<br>
+			<<getouticon>><<link [[离开|strangeGarden]]>><</link>>
+		<</if>>
+	<<elseif $SG_upgrade_type is 12>>	
+		<<if currentSkillValue('skulduggery') gte $lock and $SG_unlock is undefined>>
+			你翻出一個異常沉重的板條箱，<span class="green">它的鎖看起來不難撬開</span>，你很想知道里頭到底放了些甚麼。<<tiredness 2>><<gtiredness>><br>
+			<<link [[撬锁 (0:05)|strangeGarden_upgrade]]>><<pass 5>><<set $SG_unlock to 1>><</link>>
+		<<elseif currentSkillValue('skulduggery') lt $lock>>
+			你翻出一個異常沉重的板條箱，<span class="red">它的鎖看起來不是你能撬開的</span>，只好又再把它放回去。<<skulduggeryrequired>><<tiredness 1>><<gtiredness>><br>
+			<<getouticon>><<link [[离开|strangeGarden]]>><</link>>
+		<<elseif $SG_unlock is 1 >>	
+			<<set $SG_sea_upgrade += 1>>
+			<<unset $SG_unlock>>
+			<<add_plot strangeGarden sea 1 small>>
+			<<set _plant_keys to Object.keys($plants)>>
+			<<if _plant_keys.length gt 0>>
+				<<for _t to 0; _t lt _plant_keys.length; _t++>>
+						<<if $plants[_plant_keys[_t]].amount gte 1>>
+							<<if !$plants_known.includes(_plant_keys[_t])>>
+								<<set $plants_known.push(_plant_keys[_t])>>
+							<</if>>
+						<</if>>	
+				<</for>>
+			<</if>>	
+			板條箱內裝了台奇特的設備，板條箱內還有其他零件，及使用說明。<br>
+			說明書上寫著按圖組裝後，即可投入生產，雖然不明白到底如何生產，反正先組裝起來再說。<br>
+			<<getouticon>><<link [[离开|strangeGarden]]>><</link>>
+		<</if>>		
 	<</if>>	
 <<elseif $SG_upgrade_refresh is 1>>
 	<<unset $SG_upgrade_refresh>>
@@ -117,6 +192,15 @@
 	<</for>>
 	<<for _o to 0; _o lt $SG_human_upgrade; _o++>>	
 		<<add_plot strangeGarden human 1 small>>
+	<</for>>
+	<<for _o to 0; _o lt $SG_kitchen_upgrade; _o++>>	
+		<<add_plot strangeGarden kitchen 1 small>>
+	<</for>>
+	<<for _o to 0; _o lt $SG_river_upgrade; _o++>>	
+		<<add_plot strangeGarden kitchen 1 small>>
+	<</for>>
+	<<for _o to 0; _o lt $SG_sea_upgrade; _o++>>	
+		<<add_plot strangeGarden kitchen 1 small>>
 	<</for>>
 	<<getouticon>><<link [[离开|strangeGarden]]>><</link>>	
 <</if>>	

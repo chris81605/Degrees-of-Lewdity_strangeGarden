@@ -76,6 +76,9 @@
 		<<case "human">><<set _bedType to "長得像人的奇怪物體">>
 		<<case "oyster">><<set _bedType to "水塘邊的珍珠貝">>
 		<<case "chicken">><<set _bedType to "田邊的放山雞">>
+		<<case "kitchen">><<set _bedType to "萬能料理機">>
+		<<case "river">><<set _bedType to "水產養殖槽">>
+		<<case "sea">><<set _bedType to "海水槽">>
 		<<default>><<set _bedType to clone($_plot.bed)>>
 	<</switch>>
 	<<if $_plot.bed is "wood">>
@@ -133,7 +136,31 @@
 			<<case 3>> <<set $_result to `<span class="teal">良好的`+_bedType+`</span>`>>
 			<<case 4>><<set $_result to `<span class="green">優良的`+_bedType+`</span>`>>
 			<<default>> <<set $_result to `<span class="red">错误</span>`>>
-		<</switch>>			
+		<</switch>>
+	<<elseif $_plot.bed is "kitchen">>
+		<<switch Math.clamp($_plot.quality, 0, 4)>>
+			<<case 1>> <<set $_result to `<span class="blue">_bedType</span>`>>
+			<<case 2>> <<set $_result to `<span class="lblue">普通的`+_bedType+`</span>`>>
+			<<case 3>> <<set $_result to `<span class="teal">改良的`+_bedType+`</span>`>>
+			<<case 4>><<set $_result to `<span class="green">頂級的`+_bedType+`</span>`>>
+			<<default>> <<set $_result to `<span class="red">错误</span>`>>
+		<</switch>>
+	<<elseif $_plot.bed is "river">>
+		<<switch Math.clamp($_plot.quality, 0, 4)>>
+			<<case 1>> <<set $_result to `<span class="blue">_bedType</span>`>>
+			<<case 2>> <<set $_result to `<span class="lblue">普通的`+_bedType+`</span>`>>
+			<<case 3>> <<set $_result to `<span class="teal">改良的`+_bedType+`</span>`>>
+			<<case 4>><<set $_result to `<span class="green">頂級的`+_bedType+`</span>`>>
+			<<default>> <<set $_result to `<span class="red">错误</span>`>>
+		<</switch>>
+	<<elseif $_plot.bed is "sea">>
+		<<switch Math.clamp($_plot.quality, 0, 4)>>
+			<<case 1>> <<set $_result to `<span class="blue">_bedType</span>`>>
+			<<case 2>> <<set $_result to `<span class="lblue">普通的`+_bedType+`</span>`>>
+			<<case 3>> <<set $_result to `<span class="teal">改良的`+_bedType+`</span>`>>
+			<<case 4>><<set $_result to `<span class="green">頂級的`+_bedType+`</span>`>>
+			<<default>> <<set $_result to `<span class="red">错误</span>`>>
+		<</switch>>						
 	<<else>>
 		<<switch Math.clamp($_plot.quality, 0, 4)>>
 			<<case 1>> <<set $_result to `<span class="blue">贫瘠的`+_bedType+`</span>`>>
@@ -183,7 +210,13 @@
 				<<elseif $_plot.bed is "chicken">>
 					<span class="green">雞窩裡生產<<print $_plantedPlant.plural>>，現在裏頭有許多<<print $_plantedPlant.plural>>。</span>	
 				<<elseif $_plot.bed is "oyster">>
-					<span class="green">珍珠貝裡生產<<print $_plantedPlant.plural>>，現在裏頭有許多<<print $_plantedPlant.plural>>。</span>	
+					<span class="green">珍珠貝裡生產<<print $_plantedPlant.plural>>，現在裏頭有許多<<print $_plantedPlant.plural>>。</span>
+				<<elseif $_plot.bed is "kitchen">>
+					<span class="green">萬能料理機裡生產<<print $_plantedPlant.plural>>，現在已經完成了。</span>
+				<<elseif $_plot.bed is "river">>
+					<span class="green">水產養殖槽裡生產<<print $_plantedPlant.plural>>，現在非常肥美。</span>
+				<<elseif $_plot.bed is "sea">>
+					<span class="green">海水槽裡生產<<print $_plantedPlant.plural>>，現在非常肥美。</span>				
 				<<elseif $_plot.bed is "human">>
 					<<if $_plantedPlant.plural is "小瓶装母乳" or $_plantedPlant.plural is "瓶装母乳">>
 						<span class="green">像人的奇怪物體的乳房膨脹到極限了，乳汁正順著乳頭滴落，可以擠奶了。</span>
@@ -220,9 +253,15 @@
 				<<elseif $_plot.bed is "bird_nest">>
 					<span class="teal">鳥巢裡生產<<print $_plantedPlant.plural>>，現在裏頭沒有蛋，也許快有了。</span>
 				<<elseif $_plot.bed is "chicken">>
-					<span class="green">雞窩裡生產<<print $_plantedPlant.plural>>，現在裏頭沒有蛋，也許快有了。</span>	
+					<span class="teal">雞窩裡生產<<print $_plantedPlant.plural>>，現在裏頭沒有蛋，也許快有了。</span>	
 				<<elseif $_plot.bed is "oyster">>
-					<span class="green">珍珠貝裡生產<<print $_plantedPlant.plural>>，現在裏頭有一些<<print $_plantedPlant.plural>>。</span>	
+					<span class="teal">珍珠貝裡生產<<print $_plantedPlant.plural>>，現在裏頭有一些<<print $_plantedPlant.plural>>。</span>	
+				<<elseif $_plot.bed is "kitchen">>
+					<span class="teal">萬能料理機裡生產<<print $_plantedPlant.plural>>，現在快完成了。</span>
+				<<elseif $_plot.bed is "river">>
+					<span class="teal">水產養殖槽裡生產<<print $_plantedPlant.plural>>，現在快可以捕撈了。</span>
+				<<elseif $_plot.bed is "sea">>
+					<span class="teal">海水槽裡生產<<print $_plantedPlant.plural>>，現在快可以捕撈了。</span>			
 				<<elseif $_plot.bed is "human">>
 					<<if $_plantedPlant.plural is "小瓶装母乳" or $_plantedPlant.plural is "瓶装母乳">>
 						<span class="teal">像人的奇怪物體的乳房正在膨脹，現在有一定規模了，即將產奶。</span>
@@ -242,9 +281,15 @@
 				<<elseif $_plot.bed is "bird_nest">>
 					<span class="lblue">鳥巢裡生產<<print $_plantedPlant.plural>>，現在裏頭沒有蛋。</span>
 				<<elseif $_plot.bed is "chicken">>
-					<span class="green">雞窩裡生產<<print $_plantedPlant.plural>>，現在裏頭沒有蛋，也許快有了。</span>	
+					<span class="lblue">雞窩裡生產<<print $_plantedPlant.plural>>，現在裏頭沒有蛋，也許快有了。</span>	
 				<<elseif $_plot.bed is "oyster">>
-					<span class="green">珍珠貝裡生產<<print $_plantedPlant.plural>>，現在裏頭有幾個<<print $_plantedPlant.plural>>。</span>	
+					<span class="lblue">珍珠貝裡生產<<print $_plantedPlant.plural>>，現在裏頭有幾個<<print $_plantedPlant.plural>>。</span>	
+				<<elseif $_plot.bed is "kitchen">>
+					<span class="lblue">萬能料理機裡生產<<print $_plantedPlant.plural>>，現在正在製作。</span>
+				<<elseif $_plot.bed is "river">>
+					<span class="lblue">水產養殖槽裡生產<<print $_plantedPlant.plural>>，現在正在成長。</span>
+				<<elseif $_plot.bed is "sea">>
+					<span class="lblue">海水槽裡生產<<print $_plantedPlant.plural>>，現在正在成長。</span>
 				<<elseif $_plot.bed is "human">>
 					<<if $_plantedPlant.plural is "小瓶装母乳" or $_plantedPlant.plural is "瓶装母乳">>
 						<span class="lblue">像人的奇怪物體的乳房正在膨脹。</span>
@@ -264,9 +309,15 @@
 				<<elseif $_plot.bed is "bird_nest">>
 					<span class="blue">鳥巢裡生產<<print $_plantedPlant.plural>>，現在裏頭沒有蛋。</span>
 				<<elseif $_plot.bed is "chicken">>
-					<span class="green">雞窩裡生產<<print $_plantedPlant.plural>>，現在裏頭沒有蛋，也許快有了。</span>	
+					<span class="blue">雞窩裡生產<<print $_plantedPlant.plural>>，現在裏頭沒有蛋，也許快有了。</span>	
 				<<elseif $_plot.bed is "oyster">>
-					<span class="green">珍珠貝裡生產<<print $_plantedPlant.plural>>，現在裏頭有一點像<<print $_plantedPlant.plural>>。的東西</span>	
+					<span class="blue">珍珠貝裡生產<<print $_plantedPlant.plural>>，現在裏頭有一點像<<print $_plantedPlant.plural>>。的東西</span>	
+				<<elseif $_plot.bed is "kitchen">>
+					<span class="blue">萬能料理機裡生產<<print $_plantedPlant.plural>>，現在正在製作。</span>
+				<<elseif $_plot.bed is "river">>
+					<span class="blue">水產養殖槽裡生產<<print $_plantedPlant.plural>>，現在正在成長。</span>
+				<<elseif $_plot.bed is "sea">>
+					<span class="blue">海水槽裡生產<<print $_plantedPlant.plural>>，現在正在成長。</span>
 				<<elseif $_plot.bed is "human">>
 					<<if $_plantedPlant.plural is "小瓶装母乳" or $_plantedPlant.plural is "瓶装母乳">>
 						<span class="blue">像人的奇怪物體的乳房似乎有點膨脹。</span>
@@ -288,7 +339,13 @@
 				<<elseif $_plot.bed is "chicken">>
 					<span class="blue">雞窩裡準備生產<<print $_plantedPlant.plural>>。</span>	
 				<<elseif $_plot.bed is "oyster">>
-					<span class="green">珍珠貝裡準備生產<<print $_plantedPlant.plural>>。</span>	
+					<span class="blue">珍珠貝裡準備生產<<print $_plantedPlant.plural>>。</span>	
+				<<elseif $_plot.bed is "kitchen">>
+					<span class="blue">萬能料理機裡生產<<print $_plantedPlant.plural>>。</span>
+				<<elseif $_plot.bed is "river">>
+					<span class="blue">水產養殖槽裡生產<<print $_plantedPlant.plural>>。</span>
+				<<elseif $_plot.bed is "sea">>
+					<span class="blue">海水槽裡生產<<print $_plantedPlant.plural>>。</span>
 				<<elseif $_plot.bed is "human">>
 					<<if $_plantedPlant.plural is "小瓶装母乳" or $_plantedPlant.plural is "瓶装母乳">>
 						<span class="blue">像人的奇怪物體長出了乳房。</span>
@@ -376,7 +433,34 @@
 						<span class="purple"><<print (_plantbed.bed is "large" ? "珍珠貝" : "珍珠貝")>>尚未餵食。</span>
 						<br>
 						<<SG_tendingWaterPlot _plantbed>>
-					<</if>>	
+					<</if>>
+				<<elseif _plantbed.bed is "kitchen">>
+					<<if _plantbed.water is 1>>
+						<span class="green"><<print (_plantbed.bed is "large" ? "萬能料理機" : "萬能料理機")>>已經保養完成。</span>
+						<br>
+					<<else>>	
+						<span class="purple"><<print (_plantbed.bed is "large" ? "萬能料理機" : "萬能料理機")>>尚未保養。</span>
+						<br>
+						<<SG_tendingWaterPlot _plantbed>>
+					<</if>>
+				<<elseif _plantbed.bed is "river">>
+					<<if _plantbed.water is 1>>
+						<span class="green"><<print (_plantbed.bed is "large" ? "水產養殖槽" : "水產養殖槽")>>已經保養並餵食完成。</span>
+						<br>
+					<<else>>	
+						<span class="purple"><<print (_plantbed.bed is "large" ? "水產養殖槽" : "水產養殖槽")>>尚未保養及投喂。</span>
+						<br>
+						<<SG_tendingWaterPlot _plantbed>>
+					<</if>>
+				<<elseif _plantbed.bed is "sea">>
+					<<if _plantbed.water is 1>>
+						<span class="green"><<print (_plantbed.bed is "large" ? "海水槽" : "海水槽")>>已經保養並餵食完成。</span>
+						<br>
+					<<else>>	
+						<span class="purple"><<print (_plantbed.bed is "large" ? "海水槽" : "海水槽")>>尚未保養及投喂。</span>
+						<br>
+						<<SG_tendingWaterPlot _plantbed>>
+					<</if>>				
 				<<elseif _plantbed.bed is "human">>
 					<<if _plantbed.water is 1>>
 						<span class="green"><<print (_plantbed.bed is "large" ? "人形的奇怪物體" : "人形的奇怪物體")>>已經清理乾淨了。</span>
@@ -462,10 +546,11 @@
 		<<case "farm">> <<set _irrigation to ($farm.irrigation ? $farm.irrigation : 0)>>
 		<<default>> <<set _irrigation to 0>>
 	<</switch>>
+	<!--舊版顯示可種植選項邏輯，會將所有種植的選項皆顯示（不能種植的提示種植土壤）
 	<<for _plantType range $plants_known>>
 		<br>
 		<<set $_plant to setup.plants[_plantType]>>
-		<<if $_plant.season.includes(Time.season) or (_location is "garden" and $alex_greenhouse gte 3)>>
+		<<if $_plant.season.includes(Time.season) or (_location is "strangeGarden") or (_location is "garden" and $alex_greenhouse gte 3)>>
 			/* comparing soil types; check if target bed is compatible with the seed's soil type */
 			<<if $_plant.bed is _plantbed.bed>>
 				<<switch _plantbed.size>>
@@ -484,13 +569,75 @@
 					<span class="orange">(<<print $_plant.days>>天)</span>
 				<</if>>
 			<<else>>
-				<span class="blue"><<print $_plant.plural>>仅能于<<print $_plant.bed.replace("earth","土地里").replace("water","水池中").replace("wood","木頭上").replace("hive","蜂箱裡").replace("cow","長得像奶牛乳房的奇怪物體上").replace("bird_nest","奇怪的鳥巢中").replace("human","長得像人的奇怪物體裡").replace("chicken","雞窩裡").replace("oyster","水塘邊的珍珠貝")>>生產。</span>
+				<span class="blue"><<print $_plant.plural>>仅能于<<print $_plant.bed.replace("earth","土地里").replace("water","水池中").replace("wood","木頭上").replace("hive","蜂箱裡").replace("cow","長得像奶牛乳房的奇怪物體上").replace("bird_nest","奇怪的鳥巢中").replace("human","長得像人的奇怪物體裡").replace("chicken","雞窩裡").replace("oyster","水塘邊的珍珠貝").replace("kitchen","萬能料理機").replace("river","水產養殖槽").replace("sea","海水槽")>>生產。</span>
 			<</if>>
 		<<else>>
 			<<tending_season_notice $_plant>>
 		<</if>>
 
 	<</for>>
+	-->
+	<!--僅顯示當前土壤可種植之產品，當無任何產品時顯示提示-->
+    <<set _foundValidPlant to false>>  /* 追蹤是否有可種植的作物 */
+    <<set _invalidPlants to "">>  /* 存儲不可種植作物的 HTML */
+
+    <<for _plantType range $plants_known>>
+        <<set $_plant to setup.plants[_plantType]>>
+        <<if $_plant.season.includes(Time.season) or (_location is "strangeGarden") or (_location is "garden" and $alex_greenhouse gte 3)>>
+            <<if $_plant.bed is _plantbed.bed>>  /* 檢查土壤類型 */
+                <<set _foundValidPlant to true>>  /* 記錄至少有一個可種植的作物 */
+            
+                <<switch _plantbed.size>>
+                    <<case "small">><<set _passTime to 30>>
+                    <<case "medium">><<set _passTime to 90>>
+                    <<default>><<set _passTime to 180>>
+                <</switch>>
+                <<set $_timeString to getTimeString(_passTime)>>
+            
+                <<capture _passTime _plantbed _plantType>>
+                    <<if $options.images is 1 and $_plant.icon>>
+                        <img class="tending_icon" @src="`img/misc/icon/tending/` + $_plant.icon">
+                    <</if>>
+                    <<link "生產 $_plant.plural ($_timeString)" $passage>>
+                        <<pass _passTime>>
+                        <<run plantSeedsInPlot(_plantbed, _plantType)>>
+                 <</link>>
+                <</capture>>
+            
+                <<if $statdisable is "f">>
+                    <span class="orange">(<<print $_plant.days>> 天)</span>
+                <</if>>
+                <br>
+            <<else>>
+                /* 存儲不可種植作物的 HTML，稍後在折疊區塊內顯示 */
+                <<set _invalidPlants to _invalidPlants + `
+                    <div>
+                        <strong>` + $_plant.plural + `</strong> 僅能於 
+                        <spen class="gold">` + $_plant.bed.replace("earth","土地里").replace("water","水池中").replace("wood","木頭上")
+                            .replace("hive","蜂箱裡").replace("cow","長得像奶牛乳房的奇怪物體上")
+                            .replace("bird_nest","奇怪的鳥巢中").replace("human","長得像人的奇怪物體裡")
+                            .replace("chicken","雞窩裡").replace("oyster","水塘邊的珍珠貝")
+                            .replace("kitchen","萬能料理機").replace("river","水產養殖槽").replace("sea","海水槽")
+                        + `</spen>生產。
+                    </div>
+                `>>
+            <</if>>
+        <</if>>
+    <</for>>
+
+    <<if not _foundValidPlant>>
+        <p class="red">目前沒有任何可生產的物品。</p>
+    <</if>>
+
+    /* 折疊區塊：顯示所有不可種植作物 */
+    <<if _invalidPlants is not "">>
+        <details>
+            <summary>▷查看不可生產的物品</summary>
+            <div class="invalid-plants">
+                <<print _invalidPlants>>
+            </div>
+        </details>
+    <</if>>	
 	<br>
 <</widget>>
 
