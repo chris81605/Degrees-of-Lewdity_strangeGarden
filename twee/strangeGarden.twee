@@ -11,6 +11,8 @@
 	<<ensureSGState>>
 	<<strangeGarden_stage 1>>
 	<<if $debug>>
-	    <br><<link[[初始化萬物皆可種牧場|$passage]]>><<unset $first_visit_strangeGarden>> 	<<unset $strangeGarden_stage>><</link>><br>
+	    <br>
+		<<link[[添加所有種子|$passage]]>><<SG_addAllPlantsSeeds>><</link>><br>
+	    <<link[[初始化萬物皆可種牧場|$passage]]>><<reset_strangeGarden>><</link>><br>
     <</if>>
 <</if>>
