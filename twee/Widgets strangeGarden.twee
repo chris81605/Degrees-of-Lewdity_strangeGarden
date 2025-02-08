@@ -178,8 +178,8 @@
 	<<set _water_needed to 0>>
 	这里有<span class="gold"><<number $_plotsHere.length>>個</span>可使用的設備
 	。
-	<<if $SG_fertiliser.current + $SG_fertiliser.used gt 0>>
-		你现在有<span class="gold"><<number $SG_fertiliser.current>>袋</span>特殊原料。。
+	<<if $SG_state.fertiliser.current + $SG_state.fertiliser.used gt 0>>
+		你现在有<span class="gold"><<number $SG_state.fertiliser.current>>袋</span>特殊原料。。
 	<</if>>
 	操作設備的時間會随着你护理技能的升高而减少。
 	<br><br>
@@ -358,6 +358,7 @@
 			<<else>>
 				<<if _plantbed.till gte 1>>
 					設備已准备好生產。
+					<br>
 					<<SG_tendingPlantSeedsOptions _location _plantbed>>
 				<<else>>
 					設備生產前準備。
@@ -630,7 +631,7 @@
     <</if>>
 
     /* 折疊區塊：顯示所有不可種植作物 */
-    <<if _invalidPlants is not "">>
+    <<if _invalidPlants isnot "" and $debug == 1>>
         <details>
             <summary>▷查看不可生產的物品</summary>
             <div class="invalid-plants">
@@ -683,7 +684,7 @@
 			<</link>><<gtiredness>>
 		<</capture>>
 		<br>
-		<<if $SG_fertiliser.current gte 1 and _plantbed.quality lt 4 and currentSkillValue('tending') gte 400>>
+		<<if $SG_state.fertiliser.current gte 1 and _plantbed.quality lt 4 and currentSkillValue('tending') gte 400>>
 			<<set _baseTimeFert to Math.floor(_baseTime * 1.5)>>
 			<<set _timeString to getTimeString(_baseTimeFert)>>
 			<<set _fertTiredness to Math.floor(_baseTiredness * 1.5)>>
@@ -700,7 +701,7 @@
 					<<set _plantbed.till to 1>>
 
 					/* Fertilise */
-					<<set $SG_fertiliser.current-->><<set $SG_fertiliser.used++>>
+					<<set $SG_state.fertiliser.current-->><<set $SG_state.fertiliser.used++>>
 					<<set _plantbed.quality++>>
 					<<if !$backgroundTraits.includes("greenthumb")>>
 						<<if _plantbed.baseQuality is undefined>>
@@ -807,7 +808,7 @@
 		<<case 2>> <<set _tending_amount *= 1.2>>
 	<</switch>>
 	<<if !$backgroundTraits.includes("greenthumb") and $tending is 1000 and $plants_known.length gte 16 and
-	($SG_fertiliser.used gte 40 or ($SG_fertiliser.used gte 25 and $farm_stage gte 6))>>
+	($SG_state.fertiliser.used gte 40 or ($SG_state.fertiliser.used gte 25 and $farm_stage gte 6))>>
 		<<run $backgroundTraits.pushUnique("greenthumb")>>
 		<span class="gold">花大量的时间在土地上劳作会让你成为园艺大师。</span>
 		<br>

@@ -1,25 +1,57 @@
 :: Widgets strangeGarden_init [widget]
 	
-	<<widget "init_strangeGarden">>
-		<<if $init_strangeGarden is 1>> <!--首次獲得工坊初始化旗幟-->
-			<<unset $init_strangeGarden >>
-			<<set $SG_earth_upgrade to 0>><!--各設備擴充紀錄初始化-->
-			<<set $SG_water_upgrade to 0>>
-			<<set $SG_bird_nest_upgrade to 0>>
-			<<set $SG_wood_upgrade to 0>>
-			<<set $SG_hive_upgrade to 0>>
-			<<set $SG_cow_upgrade to 0>>
-			<<set $SG_human_upgrade to 0>>
-			<<set $SG_oyster_upgrade to 0>>
-			<<set $SG_chicken_upgrade to 0>>
-			<<set $SG_kitchen_upgrade to 0>>
-			<<set $SG_river_upgrade to 0>>
-			<<set $SG_sea_upgrade to 0>>
-			<<set $SG_fertiliser to {current:0,used:0}>><!--工坊專用"肥料"數量初始化-->
-			<<plots_init strangeGarden 1 earth 1 small>><!--初始化工坊可使用設備(農田*1+水池*1)-->
-			<<add_plot strangeGarden water 1 small>>
-		<</if>>
-	<</widget>>
+<<widget "init_strangeGarden">>
+	<<if $init_strangeGarden>>
+		<<set $init_strangeGarden to 0>>
+
+		<<set $SG_state to {
+			earth_upgrade: 0,
+			water_upgrade: 0,
+			bird_nest_upgrade: 0,
+			wood_upgrade: 0,
+			hive_upgrade: 0,
+			cow_upgrade: 0,
+			human_upgrade: 0,
+			oyster_upgrade: 0,
+			chicken_upgrade: 0,
+			kitchen_upgrade: 0,
+			river_upgrade: 0,
+			sea_upgrade: 0,
+			fertiliser: {current: 0, used: 0}
+		}>>
+
+		<<plots_init "strangeGarden" 1 "earth" 1 "small">>
+		<<add_plot "strangeGarden" "water" 1 "small">>
+	<</if>>
+<</widget>>
+
+<<widget "ensureSGState">>
+    <<if not $SG_state>> 
+        <<set $SG_state to {}>> 
+    <</if>>
+    
+    <<set $SG_defaults to {
+        earth_upgrade: 0,
+        water_upgrade: 0,
+        bird_nest_upgrade: 0,
+        wood_upgrade: 0,
+        hive_upgrade: 0,
+        cow_upgrade: 0,
+        human_upgrade: 0,
+        oyster_upgrade: 0,
+        chicken_upgrade: 0,
+        kitchen_upgrade: 0,
+        river_upgrade: 0,
+        sea_upgrade: 0,
+        fertiliser: {current: 0, used: 0}
+    }>>
+
+    <<for _key range Object.keys($SG_defaults)>>
+        <<if not $SG_state[_key]>>
+            <<set $SG_state[_key] to $SG_defaults[_key]>>
+        <</if>>
+    <</for>>
+<</widget>>
 		
 	<<widget "strangeGarden_link">>
 	    <<if $strangeGarden_stage is undefined>>
@@ -77,43 +109,43 @@
 			<<SG_unlockplants>>
 			<<SG_display_plot strangeGarden>><br>
 	
-			<<if $SG_earth_upgrade lte 2 or $debug is 1>>
+			<<if $SG_state.earth_upgrade lte 2 or $debug is 1>>
 				<<gardenicon "till">><<link [[開墾荒地(3:00)|strangeGarden_upgrade]]>><<pass 3 hours>><<set $SG_upgrade_type to 1>><</link>><br>
 			<</if>>	
-			<<if $SG_water_upgrade lte 2 or $debug is 1>>
+			<<if $SG_state.water_upgrade lte 2 or $debug is 1>>
 				<<gardenicon "till">><<link [[擴大池塘(3:00)|strangeGarden_upgrade]]>><<pass 3 hours>><<set $SG_upgrade_type to 2>><</link>><br>
 			<</if>>
-			<<if $SG_oyster_upgrade lte 2 or $debug is 1>>
+			<<if $SG_state.oyster_upgrade lte 2 or $debug is 1>>
 				<<gardenicon "till">><<link [[查看水塘邊的珍珠貝(1:00)|strangeGarden_upgrade]]>><<pass 1 hours>><<set $SG_upgrade_type to 8>><</link>><br>
 			<</if>>
-			<<if $SG_bird_nest_upgrade lte 2 or $debug is 1>>
+			<<if $SG_state.bird_nest_upgrade lte 2 or $debug is 1>>
 				<<gardenicon "till">><<link [[查看樹上的鳥巢(1:00)|strangeGarden_upgrade]]>><<pass 1 hours>><<set $SG_upgrade_type to 3>><</link>><br>
 			<</if>>
-			<<if $SG_chicken_upgrade lte 2 or $debug is 1>>
+			<<if $SG_state.chicken_upgrade lte 2 or $debug is 1>>
 				<<gardenicon "till">><<link [[查看田邊的雞窩(1:00)|strangeGarden_upgrade]]>><<pass 1 hours>><<set $SG_upgrade_type to 9>><</link>><br>
 			<</if>>
 			遠處工坊內似乎還有甚麼設備，不過布滿灰塵，零件散落四周，得好好整理一番。<br>
-			<<if $SG_wood_upgrade lte 2 or $debug is 1>>
+			<<if $SG_state.wood_upgrade lte 2 or $debug is 1>>
 				<<gardenicon "till">><<link [[查看堆置的木頭(1:00)|strangeGarden_upgrade]]>><<pass 1 hours>><<add_plot strangeGarden wood 1 small>><<set $SG_upgrade_type to 4>><</link>><br>
 			<</if>>
-			<<if $SG_hive_upgrade lte 2 or $debug is 1>>
+			<<if $SG_state.hive_upgrade lte 2 or $debug is 1>>
 				<<gardenicon "till">><<link [[查看散落的木箱(1:00)|strangeGarden_upgrade]]>><<pass 1 hours>><<set $SG_upgrade_type to 5>><</link>><br>
 			<</if>>
 			<br>
 			工坊深處放置了幾個可疑的板條箱，全都上鎖了，板條箱異常堅固，暴力破壞似乎行不通。<br>
-			<<if $SG_cow_upgrade lte 2 or $debug is 1>>
+			<<if $SG_state.cow_upgrade lte 2 or $debug is 1>>
 				<<gardenicon "till">><<link [[查看上鎖的板條箱(1:00)|strangeGarden_upgrade]]>><<pass 1 hours>><<set $lock to 500>><<set $SG_upgrade_type to 6>><</link>><br>
 			<</if>>
-			<<if $SG_human_upgrade lte 2 or $debug is 1>>
+			<<if $SG_state.human_upgrade lte 2 or $debug is 1>>
 				<<gardenicon "till">><<link [[查看上鎖的板條箱(1:00)|strangeGarden_upgrade]]>><<pass 1 hours>><<set $lock to 600>><<set $SG_upgrade_type to 7>><</link>><br>
 			<</if>>
-			<<if $SG_kitchen_upgrade lte 2 or $debug is 1>>
+			<<if $SG_state.kitchen_upgrade lte 2 or $debug is 1>>
 				<<gardenicon "till">><<link [[查看上鎖的板條箱(1:00)|strangeGarden_upgrade]]>><<pass 1 hours>><<set $lock to 600>><<set $SG_upgrade_type to 10>><</link>><br>
 			<</if>>
-			<<if $SG_river_upgrade lte 2 or $debug is 1>>
+			<<if $SG_state.river_upgrade lte 2 or $debug is 1>>
 				<<gardenicon "till">><<link [[查看上鎖的板條箱(1:00)|strangeGarden_upgrade]]>><<pass 1 hours>><<set $lock to 600>><<set $SG_upgrade_type to 11>><</link>><br>
 			<</if>>
-			<<if $SG_sea_upgrade lte 2 or $debug is 1>>
+			<<if $SG_state.sea_upgrade lte 2 or $debug is 1>>
 				<<gardenicon "till">><<link [[查看上鎖的板條箱(1:00)|strangeGarden_upgrade]]>><<pass 1 hours>><<set $lock to 600>><<set $SG_upgrade_type to 12>><</link>><br>
 			<</if>>
 			<<getouticon>><<link [[重新整理排序|strangeGarden_upgrade]]>><<set $SG_upgrade_refresh to 1>><</link>><br>

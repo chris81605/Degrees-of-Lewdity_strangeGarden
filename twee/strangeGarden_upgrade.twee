@@ -2,27 +2,27 @@
 <<set $outside to 1>>
 <<if $SG_upgrade_refresh is undefined>>
 	<<if  $SG_upgrade_type is 1>>
-		<<set $SG_earth_upgrade += 1>>
+		<<set $SG_state.earth_upgrade += 1>>
 		<<add_plot strangeGarden earth 1 small>>
 		你正在努里清除雜草，雜草叢生，你費了一番功夫終於整理出一塊可供種植的土地。<<tiredness 3>><<physique 2>><<gtiredness>><<gphysique>><br>
 		<<getouticon>><<link [[离开|strangeGarden]]>><</link>>
 	<<elseif $SG_upgrade_type is 2>>
-		<<set $SG_water_upgrade +=1>>
+		<<set $SG_state.water_upgrade +=1>>
 		<<add_plot strangeGarden water 1 small>>
 		你正在努力開挖池塘不是簡單的事，你費了一番功夫終於挖了個池塘出來。<<tiredness 3>><<physique 2>><<gtiredness>><<gphysique>><br>
 		<<getouticon>><<link [[离开|strangeGarden]]>><</link>>
 	<<elseif $SG_upgrade_type is 3>>	
-		<<set $SG_bird_nest_upgrade += 1>>
+		<<set $SG_state.bird_nest_upgrade += 1>>
 		<<add_plot strangeGarden bird_nest 1 small>>
 		你發現樹上有許多地方可以放鳥屋供鳥類築巢，你小心地爬上樹，將在工坊內找到的鳥屋固定在合適的地方。<<tiredness 1>><<physique 1>><<gtiredness>><<gphysique>><br>
 		<<getouticon>><<link [[离开|strangeGarden]]>><</link>>
 	<<elseif $SG_upgrade_type is 4>>	
-		<<set $SG_wood_upgrade += 1>>
+		<<set $SG_state.wood_upgrade += 1>>
 		<<add_plot strangeGarden wood 1 small>>
 		工坊內有許多木頭，也許能拿來種香菇？你將這些木頭放在陰涼潮濕的位製。<br>
 		<<getouticon>><<link [[离开|strangeGarden]]>><</link>>
 	<<elseif $SG_upgrade_type is 5>>	
-		<<set $SG_hive_upgrade += 1>>
+		<<set $SG_state.hive_upgrade += 1>>
 		<<add_plot strangeGarden hive 1 small>>
 		工坊內有許多空的木箱，也許能拿來養野蜂？經過一番修整，終於做出一個蜂箱，只需要放在合適的位置就好。<br>
 		<<getouticon>><<link [[离开|strangeGarden]]>><</link>>
@@ -34,7 +34,7 @@
 			你翻出一個沉甸甸的板條箱，<span class="red">它的鎖看起來不是你能撬開的</span>，只好又再把它放回去。<<skulduggeryrequired>><<tiredness 1>><<gtiredness>><br>
 			<<getouticon>><<link [[离开|strangeGarden]]>><</link>>
 		<<elseif $SG_unlock is 1 >>	
-			<<set $SG_cow_upgrade += 1>>
+			<<set $SG_state.cow_upgrade += 1>>
 			<<unset $SG_unlock>>
 			<<add_plot strangeGarden cow 1 small>>
 			<<set _plant_keys to Object.keys($plants)>>
@@ -59,7 +59,7 @@
 			你翻出一個異常沉重的板條箱，<span class="red">它的鎖看起來不是你能撬開的</span>，只好又再把它放回去。<<skulduggeryrequired>><<tiredness 1>><<gtiredness>><br>
 			<<getouticon>><<link [[离开|strangeGarden]]>><</link>>
 		<<elseif $SG_unlock is 1 >>	
-			<<set $SG_human_upgrade += 1>>
+			<<set $SG_state.human_upgrade += 1>>
 			<<unset $SG_unlock>>
 			<<add_plot strangeGarden human 1 small>>
 			<<set _plant_keys to Object.keys($plants)>>
@@ -77,12 +77,12 @@
 			<<getouticon>><<link [[离开|strangeGarden]]>><</link>>
 		<</if>>
     <<elseif $SG_upgrade_type is 8>>
-		<<set $SG_oyster_upgrade +=1>>
+		<<set $SG_state.oyster_upgrade +=1>>
 		<<add_plot strangeGarden oyster 1 small>>
 		你無聊的敲開水塘邊的珍珠貝，並往裡頭灌了點砂。<<tiredness 1>><<physique 1>><<gtiredness>><<gphysique>><br>
 		<<getouticon>><<link [[离开|strangeGarden]]>><</link>>
 	<<elseif $SG_upgrade_type is 9>>
-		<<set $SG_chicken_upgrade +=1>>
+		<<set $SG_state.chicken_upgrade +=1>>
 		<<add_plot strangeGarden chicken 1 small>>
 		田邊有個雞窩，也許好好照料裡頭的雞牠們能給你提供一些雞蛋？<<tiredness 1>><<physique 1>><<gtiredness>><<gphysique>><br>
 		<<getouticon>><<link [[离开|strangeGarden]]>><</link>>			
@@ -94,7 +94,7 @@
 			你翻出一個異常沉重的板條箱，<span class="red">它的鎖看起來不是你能撬開的</span>，只好又再把它放回去。<<skulduggeryrequired>><<tiredness 1>><<gtiredness>><br>
 			<<getouticon>><<link [[离开|strangeGarden]]>><</link>>
 		<<elseif $SG_unlock is 1 >>	
-			<<set $SG_kitchen_upgrade += 1>>
+			<<set $SG_state.kitchen_upgrade += 1>>
 			<<unset $SG_unlock>>
 			<<add_plot strangeGarden kitchen 1 small>>
 			<<set _plant_keys to Object.keys($plants)>>
@@ -119,7 +119,7 @@
 			你翻出一個異常沉重的板條箱，<span class="red">它的鎖看起來不是你能撬開的</span>，只好又再把它放回去。<<skulduggeryrequired>><<tiredness 1>><<gtiredness>><br>
 			<<getouticon>><<link [[离开|strangeGarden]]>><</link>>
 		<<elseif $SG_unlock is 1 >>	
-			<<set $SG_river_upgrade += 1>>
+			<<set $SG_state.river_upgrade += 1>>
 			<<unset $SG_unlock>>
 			<<add_plot strangeGarden river 1 small>>
 			<<set _plant_keys to Object.keys($plants)>>
@@ -144,7 +144,7 @@
 			你翻出一個異常沉重的板條箱，<span class="red">它的鎖看起來不是你能撬開的</span>，只好又再把它放回去。<<skulduggeryrequired>><<tiredness 1>><<gtiredness>><br>
 			<<getouticon>><<link [[离开|strangeGarden]]>><</link>>
 		<<elseif $SG_unlock is 1 >>	
-			<<set $SG_sea_upgrade += 1>>
+			<<set $SG_state.sea_upgrade += 1>>
 			<<unset $SG_unlock>>
 			<<add_plot strangeGarden sea 1 small>>
 			<<set _plant_keys to Object.keys($plants)>>
@@ -165,41 +165,41 @@
 <<elseif $SG_upgrade_refresh is 1>>
 	<<unset $SG_upgrade_refresh>>
 	<<plots_init strangeGarden 1 earth 1 small>>
-	<<for _i to 0; _i lt $SG_earth_upgrade; _i++>>
+	<<for _i to 0; _i lt $SG_state.earth_upgrade; _i++>>
 		<<add_plot strangeGarden earth 1 small>>
 	<</for>>
 	<<add_plot strangeGarden water 1 small>>
-	<<for _j to 0; _j lt $SG_water_upgrade; _j++>>
+	<<for _j to 0; _j lt $SG_state.water_upgrade; _j++>>
 		<<add_plot strangeGarden water 1 small>>
 	<</for>>
-	<<for _k to 0; _k lt $SG_oyster_upgrade; _k++>>
+	<<for _k to 0; _k lt $SG_state.oyster_upgrade; _k++>>
 		<<add_plot strangeGarden oyster 1 small>>
 	<</for>>
-	<<for _k to 0; _k lt $SG_bird_nest_upgrade; _k++>>
+	<<for _k to 0; _k lt $SG_state.bird_nest_upgrade; _k++>>
 		<<add_plot strangeGarden bird_nest 1 small>>
 	<</for>>
-	<<for _k to 0; _k lt $SG_chicken_upgrade; _k++>>
+	<<for _k to 0; _k lt $SG_state.chicken_upgrade; _k++>>
 		<<add_plot strangeGarden chicken 1 small>>
 	<</for>>
-	<<for _l to 0; _l lt $SG_wood_upgrade; _l++>>	
+	<<for _l to 0; _l lt $SG_state.wood_upgrade; _l++>>	
 		<<add_plot strangeGarden wood 1 small>>
 	<</for>>	
-	<<for _m to 0; _m lt $SG_hive_upgrade; _m++>>
+	<<for _m to 0; _m lt $SG_state.hive_upgrade; _m++>>
 		<<add_plot strangeGarden hive 1 small>>
 	<</for>>
-	<<for _n to 0; _n lt $SG_cow_upgrade; _n++>>	
+	<<for _n to 0; _n lt $SG_state.cow_upgrade; _n++>>	
 		<<add_plot strangeGarden cow 1 small>>
 	<</for>>
-	<<for _o to 0; _o lt $SG_human_upgrade; _o++>>	
+	<<for _o to 0; _o lt $SG_state.human_upgrade; _o++>>	
 		<<add_plot strangeGarden human 1 small>>
 	<</for>>
-	<<for _o to 0; _o lt $SG_kitchen_upgrade; _o++>>	
+	<<for _o to 0; _o lt $SG_state.kitchen_upgrade; _o++>>	
 		<<add_plot strangeGarden kitchen 1 small>>
 	<</for>>
-	<<for _o to 0; _o lt $SG_river_upgrade; _o++>>	
+	<<for _o to 0; _o lt $SG_state.river_upgrade; _o++>>	
 		<<add_plot strangeGarden kitchen 1 small>>
 	<</for>>
-	<<for _o to 0; _o lt $SG_sea_upgrade; _o++>>	
+	<<for _o to 0; _o lt $SG_state.sea_upgrade; _o++>>	
 		<<add_plot strangeGarden kitchen 1 small>>
 	<</for>>
 	<<getouticon>><<link [[离开|strangeGarden]]>><</link>>	
