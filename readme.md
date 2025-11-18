@@ -9,7 +9,7 @@
 # 需求  
 * 需要搭配[MODLOADER][JML]使用  
 * 需搭配[Degrees of Lewdity 中文本地化][DOLCN]使用  
-* 需搭配[Simple Framework][SF]使用  
+* 需搭配[Simple Framework][SF]使用或[maplebirchframework][MF]  
 
 
 # 萬物皆可種農場  
@@ -18,6 +18,13 @@
   * 在工業區增加一個可以生產任何商品的生產基地。
   
 # 更新日誌 
+**0.13.1**  
+* 增加對[maplebirchframework][MF]的兼容性  
+* 嘗試檢測使用者是否正確安裝前置框架，到檢測不到任一前置框架或是版本過低時將彈窗提示。    
+* 使用者沒安裝`simple framework`、或`maplebirch framework`或安裝框架版本低於要求：  
+    (1)版本不符合需求 => 彈窗警告  
+    (2)沒裝必要框架 => 不執行相關模組註冊動作  
+
 **0.13.0**  
 * 修復與遊戲版本`0.5.5.9`的兼容性（澆水不再報錯），從此版本開始遊戲本體最低要求為`0.5.5.9`。    
 
@@ -98,3 +105,4 @@
 [JML]:https://github.com/Lyoko-Jeremie/sugarcube-2-ModLoader  
 [DOLCN]:https://github.com/Eltirosto/Degrees-of-Lewdity-Chinese-Localization  
 [SF]:https://github.com/emicoto/DOLMods
+[MF]:https://github.com/MaplebirchLeaf/SCML-DOL-maplebirchframework
