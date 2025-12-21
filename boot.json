@@ -1,6 +1,6 @@
 {
   "name": "StrangeGarden",
-  "version": "0.13.1",
+  "version": "0.14.1",
   "styleFileList": [],
   "scriptFileList": [],
   "scriptFileList_preload":["js/stg.js"],
