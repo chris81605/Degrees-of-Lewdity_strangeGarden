@@ -280,8 +280,8 @@
 
     <<set _harvestTimes = { small: 5, medium: 15, large: 60 }>>
     這裡有<span class="gold"><<number $_plotsHere.length>></span>個可使用的設備。
-    <<if $SG_state.fertiliser.current + $SG_state.fertiliser.used gt 0>>
-        你現在有<span class="gold"><<number $SG_state.fertiliser.current>></span>袋特殊原料。
+    <<if $fertiliser.current + $fertiliser.used gt 0>>
+        你現在有<span class="gold"><<number $fertiliser.current>></span>袋特殊原料。
     <</if>>
     操作設備的時間會隨著護理技能升高而減少。
     <br><br>
@@ -524,7 +524,7 @@
 			<</link>><<gtiredness>>
 		<</capture>>
 		<br>
-		<<if $SG_state.fertiliser.current gte 1 and _plantbed.quality lt 4 and currentSkillValue('tending') gte 400>>
+		<<if $fertiliser.current gte 1 and _plantbed.quality lt 4 and currentSkillValue('tending') gte 400>>
 			<<set _baseTimeFert to Math.floor(_baseTime * 1.5)>>
 			<<set _timeString to getTimeString(_baseTimeFert)>>
 			<<set _fertTiredness to Math.floor(_baseTiredness * 1.5)>>
@@ -541,7 +541,7 @@
 					<<set _plantbed.till to 1>>
 
 					/* Fertilise */
-					<<set $SG_state.fertiliser.current-->><<set $SG_state.fertiliser.used++>>
+					<<set $fertiliser.current-->><<set $fertiliser.used++>>
 					<<set _plantbed.quality++>>
 					<<if !$backgroundTraits.includes("greenthumb")>>
 						<<if _plantbed.baseQuality is undefined>>
@@ -667,9 +667,9 @@
         <<case 2>> <<set _tending_amount *= 1.2>>
     <</switch>>
 
-    /* greenthumb 判定保持原本 $SG_state.fertiliser.used */
+    /* greenthumb 判定保持原本 $fertiliser.used */
     <<if !$backgroundTraits.includes("greenthumb") and $tending is 1000 and $plants_known.length gte 16 and
-        ($SG_state.fertiliser.used gte 40 or ($SG_state.fertiliser.used gte 25 and $farm_stage gte 6))>>
+        ($fertiliser.used gte 40 or ($fertiliser.used gte 25 and $farm_stage gte 6))>>
         <<run $backgroundTraits.pushUnique("greenthumb")>>
         <span class="gold">花大量的时间在土地上劳作会让你成为园艺大师。</span>
         <br>
