@@ -64,6 +64,7 @@
 	<<set $_plot.stage to 0>>
 <</widget>>
 
+<!--
 <<widget "SG_display_quality">><<silently>>
 	<<set $_plot to _args[0]>>
 	<<switch $_plot.bed>>
@@ -170,337 +171,206 @@
 			<<default>> <<set $_result to `<span class="red">错误</span>`>>
 		<</switch>>
 	<</if>>
-<</silently>><<print $_result>><</widget>>
+<</silently>><<print $_result>>
 
-<<widget "SG_display_plot">>/*Argument is the plot location you want to display.*/
-	<<set _location to _args[0]>>
-	<<set $_plotsHere to $plots[_location]>>
-	<<set _water_needed to 0>>
-	这里有<span class="gold"><<number $_plotsHere.length>>個</span>可使用的設備
-	。
-	<<if $SG_state.fertiliser.current + $SG_state.fertiliser.used gt 0>>
-		你现在有<span class="gold"><<number $SG_state.fertiliser.current>>袋</span>特殊原料。。
-	<</if>>
-	操作設備的時間會随着你护理技能的升高而减少。
-	<br><br>
+<</widget>>
+-->
 
-	<<set $_i to 1>>
+<<widget "SG_display_quality">>
+    <<silently>>
+    <<set _plot = _args[0]>>
 
-	<<for _plantbed range $_plotsHere>>
-		<<capture _plantbed>>
-			<span class="gold">第 $_i 号設備(<<SG_display_quality _plantbed>>):</span>
-			<<set $_plot to _plantbed>>
-			<<if _plantbed.stage gte 1>>
-				<<set $_plantedPlant to setup.plants[_plantbed.plant]>>
+    /* 定義每個 bed 對應的名稱 */
+    <<set _bedNames = {
+        water: "池子",
+        earth: "土壤",
+        wood: "木頭",
+        hive: "蜂箱",
+        cow: "長得像奶牛乳房的奇怪物體",
+        bird_nest: "樹上的鳥巢",
+        human: "長得像人的奇怪物體",
+        oyster: "水塘邊的珍珠貝",
+        chicken: "田邊的放山雞",
+        kitchen: "萬能料理機",
+        river: "水產養殖槽",
+        sea: "海水槽"
+    }>>
 
-				<<if $weather is "rain">>
-					<<set _plantbed.water to 1>>
-				<</if>>
-			<</if>>
+    <<set _bedType = _bedNames[_plot.bed] || _plot.bed>>
 
-			<<if _plantbed.stage gte 5>>
-				<<if $_plot.bed is "wood">>
-					<span class="green">這裡種植了<<print $_plantedPlant.plural>>，<<print $_plantedPlant.plural>>已經開傘了，可以收成了。</span>
-				<<elseif $_plot.bed is "hive">>
-					<span class="green">這裡生產<<print $_plantedPlant.plural>>，裏頭的<<print $_plantedPlant.plural>>滿溢而出，可以收成了。</span>
-				<<elseif $_plot.bed is "cow">>
-					<span class="green">這裡生產<<print $_plantedPlant.plural>>奶牛的乳房膨脹到極限了，乳汁正順著乳頭滴落，可以擠奶了。</span>
-				<<elseif $_plot.bed is "bird_nest">>
-					<span class="green">鳥巢裡生產<<print $_plantedPlant.plural>>，現在裏頭有許多<<print $_plantedPlant.plural>>。</span>
-				<<elseif $_plot.bed is "chicken">>
-					<span class="green">雞窩裡生產<<print $_plantedPlant.plural>>，現在裏頭有許多<<print $_plantedPlant.plural>>。</span>	
-				<<elseif $_plot.bed is "oyster">>
-					<span class="green">珍珠貝裡生產<<print $_plantedPlant.plural>>，現在裏頭有許多<<print $_plantedPlant.plural>>。</span>
-				<<elseif $_plot.bed is "kitchen">>
-					<span class="green">萬能料理機裡生產<<print $_plantedPlant.plural>>，現在已經完成了。</span>
-				<<elseif $_plot.bed is "river">>
-					<span class="green">水產養殖槽裡生產<<print $_plantedPlant.plural>>，現在非常肥美。</span>
-				<<elseif $_plot.bed is "sea">>
-					<span class="green">海水槽裡生產<<print $_plantedPlant.plural>>，現在非常肥美。</span>				
-				<<elseif $_plot.bed is "human">>
-					<<if $_plantedPlant.plural is "小瓶装母乳" or $_plantedPlant.plural is "瓶装母乳">>
-						<span class="green">像人的奇怪物體的乳房膨脹到極限了，乳汁正順著乳頭滴落，可以擠奶了。</span>
-					<<elseif $_plantedPlant.plural is "瓶装精液">>
-						<span class="green">像人的奇怪物體的蛋蛋膨脹到極限了，棒狀物體高高的翹起，精液正不斷湧出，可以榨精了。</span>
-					<</if>>	
-				<<else>>
-					<span class="green"><<print $_plantedPlant.plural>>正在开花，马上就可以采摘了。</span>
-				<</if>>
-				<br>
-				<<switch _plantbed.size>>
-					<<case "small">> <<set $_timeStr to "0:05">><<set _pass to 5>>
-					<<case "medium">> <<set $_timeStr to "0:15">><<set _pass to 15>>
-					<<default>> <<set $_timeStr to "1:00">><<set _pass to 60>>
-				<</switch>>
+    /* 定義品質對應的描述前綴 */
+    <<set _qualityPrefixes = {
+        blue: "blue",
+        lblue: "lblue",
+        teal: "teal",
+        green: "green",
+        default: "red"
+    }>>
 
-				<<if $leftarm is "bound" and $rightarm is "bound">>
-					<span class="red">你的手臂被捆绑住了，你无法使用設備。</span>
-				<<else>>
-					<<if $options.images is 1 and $_plantedPlant.icon>>
-						<img class="tending_icon" @src="`img/misc/icon/tending/` + $_plantedPlant.icon">
-					<</if>>
-					<<link "收成 ($_timeStr)" $passage>><<pass _pass>><<SG_tending_harvest _plantbed>><<clear_plot _plantbed>><</link>>
-				<</if>>
-				<br>
+    /* 針對每種 bed 類型，定義對應的品質描述文字 */
+    <<set _bedQualityDesc = {
+        wood: ["破爛的","普通的","優良的","上好的"],
+        hive: ["迷你的","小的","中等的","特大的"],
+        cow: ["瘦弱的","普通的","碩大的","無與倫比的"],
+        bird_nest: ["一個","幾個","很多個","無數個"],
+        chicken: ["一隻","幾隻","很多隻","無數隻"],
+        human: ["藍色","普通的","良好的","優良的"],
+        oyster: ["藍色","普通的","良好的","優良的"],
+        kitchen: ["藍色","普通的","改良的","頂級的"],
+        river: ["藍色","普通的","改良的","頂級的"],
+        sea: ["藍色","普通的","改良的","頂級的"],
+        default: ["贫瘠的","普通的","肥沃的","沃腴的"]
+    }>>
 
-			<<elseif _plantbed.stage is 4>>
-				<<if $_plot.bed is "wood">>
-					<span class="teal">這裡種植了<<print $_plantedPlant.plural>>，<<print $_plantedPlant.plural>>快開傘了。</span>
-				<<elseif $_plot.bed is "hive">>
-					<span class="teal">這裡生產<<print $_plantedPlant.plural>>，裏頭的<<print $_plantedPlant.plural>>快滿了。</span>
-				<<elseif $_plot.bed is "cow">>
-					<span class="teal">這裡生產<<print $_plantedPlant.plural>>奶牛的乳房正在膨脹，現在有一定規模了，即將產奶。</span>
-				<<elseif $_plot.bed is "bird_nest">>
-					<span class="teal">鳥巢裡生產<<print $_plantedPlant.plural>>，現在裏頭沒有蛋，也許快有了。</span>
-				<<elseif $_plot.bed is "chicken">>
-					<span class="teal">雞窩裡生產<<print $_plantedPlant.plural>>，現在裏頭沒有蛋，也許快有了。</span>	
-				<<elseif $_plot.bed is "oyster">>
-					<span class="teal">珍珠貝裡生產<<print $_plantedPlant.plural>>，現在裏頭有一些<<print $_plantedPlant.plural>>。</span>	
-				<<elseif $_plot.bed is "kitchen">>
-					<span class="teal">萬能料理機裡生產<<print $_plantedPlant.plural>>，現在快完成了。</span>
-				<<elseif $_plot.bed is "river">>
-					<span class="teal">水產養殖槽裡生產<<print $_plantedPlant.plural>>，現在快可以捕撈了。</span>
-				<<elseif $_plot.bed is "sea">>
-					<span class="teal">海水槽裡生產<<print $_plantedPlant.plural>>，現在快可以捕撈了。</span>			
-				<<elseif $_plot.bed is "human">>
-					<<if $_plantedPlant.plural is "小瓶装母乳" or $_plantedPlant.plural is "瓶装母乳">>
-						<span class="teal">像人的奇怪物體的乳房正在膨脹，現在有一定規模了，即將產奶。</span>
-					<<elseif $_plantedPlant.plural is "瓶装精液">>
-						<span class="teal">像人的奇怪物體的蛋蛋正在膨脹，現在有一定規模了，棒狀物體也脹大變硬，快可以榨精了。</span>
-					<</if>>	
-				<<else>>
-					<span class="teal"><<print $_plantedPlant.plural>>正在生長。</span>
-				<</if>>
-			<<elseif _plantbed.stage is 3>>
-				<<if $_plot.bed is "wood">>
-					<span class="lblue">這裡種植了<<print $_plantedPlant.plural>>，<<print $_plantedPlant.plural>>正在生長。</span>
-				<<elseif $_plot.bed is "hive">>
-					<span class="lblue">這裡生產<<print $_plantedPlant.plural>>，裏頭的<<print $_plantedPlant.plural>>半滿了。</span>
-				<<elseif $_plot.bed is "cow">>
-					<span class="lblue">這裡生產<<print $_plantedPlant.plural>>奶牛的乳房正在膨脹。</span>
-				<<elseif $_plot.bed is "bird_nest">>
-					<span class="lblue">鳥巢裡生產<<print $_plantedPlant.plural>>，現在裏頭沒有蛋。</span>
-				<<elseif $_plot.bed is "chicken">>
-					<span class="lblue">雞窩裡生產<<print $_plantedPlant.plural>>，現在裏頭沒有蛋，也許快有了。</span>	
-				<<elseif $_plot.bed is "oyster">>
-					<span class="lblue">珍珠貝裡生產<<print $_plantedPlant.plural>>，現在裏頭有幾個<<print $_plantedPlant.plural>>。</span>	
-				<<elseif $_plot.bed is "kitchen">>
-					<span class="lblue">萬能料理機裡生產<<print $_plantedPlant.plural>>，現在正在製作。</span>
-				<<elseif $_plot.bed is "river">>
-					<span class="lblue">水產養殖槽裡生產<<print $_plantedPlant.plural>>，現在正在成長。</span>
-				<<elseif $_plot.bed is "sea">>
-					<span class="lblue">海水槽裡生產<<print $_plantedPlant.plural>>，現在正在成長。</span>
-				<<elseif $_plot.bed is "human">>
-					<<if $_plantedPlant.plural is "小瓶装母乳" or $_plantedPlant.plural is "瓶装母乳">>
-						<span class="lblue">像人的奇怪物體的乳房正在膨脹。</span>
-					<<elseif $_plantedPlant.plural is "瓶装精液">>
-						<span class="lblue">像人的奇怪物體的蛋蛋正在膨脹。</span>
-					<</if>>	
-				<<else>>
-					<span class="lblue"><<print $_plantedPlant.plural>>正在生長。</span>
-				<</if>>
-			<<elseif _plantbed.stage is 2>>
-				<<if $_plot.bed is "wood">>
-					<span class="blue">這裡種植了<<print $_plantedPlant.plural>>，<<print $_plantedPlant.plural>>長出一點了。</span>
-				<<elseif $_plot.bed is "hive">>
-					<span class="blue">這裡生產<<print $_plantedPlant.plural>>，裏頭有些<<print $_plantedPlant.plural>>。</span>
-				<<elseif $_plot.bed is "cow">>
-					<span class="blue">這裡生產<<print $_plantedPlant.plural>>奶牛的乳房似乎有點膨脹。</span>
-				<<elseif $_plot.bed is "bird_nest">>
-					<span class="blue">鳥巢裡生產<<print $_plantedPlant.plural>>，現在裏頭沒有蛋。</span>
-				<<elseif $_plot.bed is "chicken">>
-					<span class="blue">雞窩裡生產<<print $_plantedPlant.plural>>，現在裏頭沒有蛋，也許快有了。</span>	
-				<<elseif $_plot.bed is "oyster">>
-					<span class="blue">珍珠貝裡生產<<print $_plantedPlant.plural>>，現在裏頭有一點像<<print $_plantedPlant.plural>>。的東西</span>	
-				<<elseif $_plot.bed is "kitchen">>
-					<span class="blue">萬能料理機裡生產<<print $_plantedPlant.plural>>，現在正在製作。</span>
-				<<elseif $_plot.bed is "river">>
-					<span class="blue">水產養殖槽裡生產<<print $_plantedPlant.plural>>，現在正在成長。</span>
-				<<elseif $_plot.bed is "sea">>
-					<span class="blue">海水槽裡生產<<print $_plantedPlant.plural>>，現在正在成長。</span>
-				<<elseif $_plot.bed is "human">>
-					<<if $_plantedPlant.plural is "小瓶装母乳" or $_plantedPlant.plural is "瓶装母乳">>
-						<span class="blue">像人的奇怪物體的乳房似乎有點膨脹。</span>
-					<<elseif $_plantedPlant.plural is "瓶装精液">>
-						<span class="blue">像人的奇怪物體的蛋蛋似乎有點膨脹。</span>
-					<</if>>	
-				<<else>>
-					<span class="blue"><<print $_plantedPlant.plural>>正在生長。</span>
-				<</if>>
-			<<elseif _plantbed.stage is 1>>
-				<<if $_plot.bed is "wood">>
-					<span class="blue">這裡種植了<<print $_plantedPlant.plural>>。</span>
-				<<elseif $_plot.bed is "hive">>
-					<span class="blue">這裡準備生產<<print $_plantedPlant.plural>>。</span>
-				<<elseif $_plot.bed is "cow">>
-					<span class="blue">這裡準備生產<<print $_plantedPlant.plural>>。</span>
-				<<elseif $_plot.bed is "bird_nest">>
-					<span class="blue">鳥巢裡準備生產<<print $_plantedPlant.plural>>。</span>
-				<<elseif $_plot.bed is "chicken">>
-					<span class="blue">雞窩裡準備生產<<print $_plantedPlant.plural>>。</span>	
-				<<elseif $_plot.bed is "oyster">>
-					<span class="blue">珍珠貝裡準備生產<<print $_plantedPlant.plural>>。</span>	
-				<<elseif $_plot.bed is "kitchen">>
-					<span class="blue">萬能料理機裡生產<<print $_plantedPlant.plural>>。</span>
-				<<elseif $_plot.bed is "river">>
-					<span class="blue">水產養殖槽裡生產<<print $_plantedPlant.plural>>。</span>
-				<<elseif $_plot.bed is "sea">>
-					<span class="blue">海水槽裡生產<<print $_plantedPlant.plural>>。</span>
-				<<elseif $_plot.bed is "human">>
-					<<if $_plantedPlant.plural is "小瓶装母乳" or $_plantedPlant.plural is "瓶装母乳">>
-						<span class="blue">像人的奇怪物體長出了乳房。</span>
-					<<elseif $_plantedPlant.plural is "瓶装精液">>
-						<span class="blue">像人的奇怪物體的長出了蛋蛋以及一根棒狀物體。</span>
-					<</if>>	
-				<<else>>
-					<span class="blue"><<print $_plantedPlant.plural>>正在生長。</span>
-				<</if>>
-			<<else>>
-				<<if _plantbed.till gte 1>>
-					設備已准备好生產。
-					<br>
-					<<SG_tendingPlantSeedsOptions _location _plantbed>>
-				<<else>>
-					設備生產前準備。
-					<br>
-					<<SG_tendingTillOptions _plantbed>>
-				<</if>>
-			<</if>>
-			<<if _plantbed.stage gte 1 and _plantbed.stage lt 5>>
-				<<if _plantbed.bed is "water">>
-					<span class="green"><<print (_plantbed.bed is "large" ? "池塘" : "池塘")>>無需特別照顧。</span>
-					<br>
-				<<elseif _plantbed.bed is "earth">>
-					<<if _plantbed.water is 1>>
-						<span class="green"><<print (_plantbed.bed is "large" ? "土壤" : "土壤")>>已经澆水了。</span>
-						<br>
-					<<else>>
-						<span class="purple"><<print (_plantbed.bed is "large" ? "土壤" : "土壤")>>尚未澆水。</span>
-						<br>
-						<<SG_tendingWaterPlot _plantbed>>
-						<br>
-					<</if>>	
-				<<elseif _plantbed.bed is "wood">>
-					<<if _plantbed.water is 1>>
-						<span class="green"><<print (_plantbed.bed is "large" ? "木頭" : "木頭")>>已经澆水了。</span>
-						<br>
-					<<else>>	
-						<span class="purple"><<print (_plantbed.bed is "large" ? "木頭" : "木頭")>>尚未澆水。</span>
-						<br>
-						<<SG_tendingWaterPlot _plantbed>>
-					<</if>>	
-				<<elseif _plantbed.bed is "hive">>
-					<<if _plantbed.water is 1>>
-						<span class="green"><<print (_plantbed.bed is "large" ? "蜂箱" : "蜂箱")>>已经打掃乾淨了。</span>
-						<br>
-					<<else>>	
-						<span class="purple"><<print (_plantbed.bed is "large" ? "蜂箱" : "蜂箱")>>尚未打掃。</span>
-						<br>
-						<<SG_tendingWaterPlot _plantbed>>
-					<</if>>	
-				<<elseif _plantbed.bed is "cow">>
-					<<if _plantbed.water is 1>>
-						<span class="green"><<print (_plantbed.bed is "large" ? "長得像奶牛乳房的奇怪物體" : "長得像奶牛乳房的奇怪物體")>>已经清理乾淨了。</span>
-						你不曉得它運作的原理，也只能維持設備表面清潔了。
-						<br>
-					<<else>>	
-						<span class="purple"><<print (_plantbed.bed is "large" ? "長得像奶牛乳房的奇怪物體" : "長得像奶牛乳房的奇怪物體")>>尚未清理。</span>
-						<br>
-						<<SG_tendingWaterPlot _plantbed>>
-					<</if>>
-				<<elseif _plantbed.bed is "bird_nest">>
-					<<if _plantbed.water is 1>>
-						<span class="green"><<print (_plantbed.bed is "large" ? "鳥屋" : "鳥屋")>>已經打掃乾淨，並提供必要的食物與水。</span>
-						<br>
-					<<else>>	
-						<span class="purple"><<print (_plantbed.bed is "large" ? "鳥屋" : "鳥屋")>>尚未清理。</span>
-						<br>
-						<<SG_tendingWaterPlot _plantbed>>
-					<</if>>
-				<<elseif _plantbed.bed is "chicken">>
-					<<if _plantbed.water is 1>>
-						<span class="green"><<print (_plantbed.bed is "large" ? "雞窩" : "雞窩")>>已經打掃乾淨，並提供必要的食物與水。</span>
-						<br>
-					<<else>>	
-						<span class="purple"><<print (_plantbed.bed is "large" ? "雞窩" : "雞窩")>>尚未清理。</span>
-						<br>
-						<<SG_tendingWaterPlot _plantbed>>
-					<</if>>	
-				<<elseif _plantbed.bed is "oyster">>
-					<<if _plantbed.water is 1>>
-						<span class="green"><<print (_plantbed.bed is "large" ? "珍珠貝" : "珍珠貝")>>已經給它一些食物。</span>
-						<br>
-					<<else>>	
-						<span class="purple"><<print (_plantbed.bed is "large" ? "珍珠貝" : "珍珠貝")>>尚未餵食。</span>
-						<br>
-						<<SG_tendingWaterPlot _plantbed>>
-					<</if>>
-				<<elseif _plantbed.bed is "kitchen">>
-					<<if _plantbed.water is 1>>
-						<span class="green"><<print (_plantbed.bed is "large" ? "萬能料理機" : "萬能料理機")>>已經保養完成。</span>
-						<br>
-					<<else>>	
-						<span class="purple"><<print (_plantbed.bed is "large" ? "萬能料理機" : "萬能料理機")>>尚未保養。</span>
-						<br>
-						<<SG_tendingWaterPlot _plantbed>>
-					<</if>>
-				<<elseif _plantbed.bed is "river">>
-					<<if _plantbed.water is 1>>
-						<span class="green"><<print (_plantbed.bed is "large" ? "水產養殖槽" : "水產養殖槽")>>已經保養並餵食完成。</span>
-						<br>
-					<<else>>	
-						<span class="purple"><<print (_plantbed.bed is "large" ? "水產養殖槽" : "水產養殖槽")>>尚未保養及投喂。</span>
-						<br>
-						<<SG_tendingWaterPlot _plantbed>>
-					<</if>>
-				<<elseif _plantbed.bed is "sea">>
-					<<if _plantbed.water is 1>>
-						<span class="green"><<print (_plantbed.bed is "large" ? "海水槽" : "海水槽")>>已經保養並餵食完成。</span>
-						<br>
-					<<else>>	
-						<span class="purple"><<print (_plantbed.bed is "large" ? "海水槽" : "海水槽")>>尚未保養及投喂。</span>
-						<br>
-						<<SG_tendingWaterPlot _plantbed>>
-					<</if>>				
-				<<elseif _plantbed.bed is "human">>
-					<<if _plantbed.water is 1>>
-						<span class="green"><<print (_plantbed.bed is "large" ? "人形的奇怪物體" : "人形的奇怪物體")>>已經清理乾淨了。</span>
-						你不曉得它運作的原理，也只能維持設備表面清潔了。
-						<br>
-					<<else>>	
-						<span class="purple"><<print (_plantbed.bed is "large" ? "人形的奇怪物體" : "人形的奇怪物體")>>尚未清理。</span>
-						<br>
-						<<SG_tendingWaterPlot _plantbed>>
-					<</if>>	
-				<</if>>
-			<</if>>
-			<br>
+    <<set _q = Math.clamp(_plot.quality, 1, 4) - 1>>
+    <<set _descList = _bedQualityDesc[_plot.bed] || _bedQualityDesc.default>>
+    <<set _prefix = _descList[_q] || "错误">>
+    <<set _colorMap = ["blue","lblue","teal","green"]>>
+    <<set _color = _colorMap[_q] || "red">>
 
-		<</capture>>
-		<<set $_i++>>
-	<</for>>
+    <<set $_result = `<span class="${_color}">${_prefix}${_bedType}</span>`>>
+    <</silently>>
+    <<print $_result>>
+<</widget>>
 
-	<<if _water_needed gte 1>>
-		<<set _plotsToWater to $_plotsHere.filter(plot => plot.stage >= 1 && plot.stage < 5 && plot.bed !== "water" && plot.water === 0)>>
-		<<set _totalTimeToWater to 0>>
-		<<run _plotsToWater.forEach(plot => _totalTimeToWater += setup.tending.wateringTimes[plot.size])>>
-		<<set $_time to getTimeString(_totalTimeToWater)>>
+<<widget "SG_display_plot">>
+    <<set _location to _args[0]>>
+    <<set $_plotsHere to $plots[_location]>>
 
-			<<if !($leftarm is "bound" and $rightarm is "bound")>>
-				<<gardenicon "water">>
-				<<link "给所有設備加水 ($_time)" $passage>>
-					<<SG_tendingWaterAllDryBeds _plotsToWater>><<tiredness _water_needed>><<physique _water_needed>><<tending _water_needed>>
-				<</link>><<gtiredness>><<gtending>>
-			<</if>>
-		<br>
+<<set _stageText = {
+        1: { color: "blue" },
+        2: { color: "blue" },
+        3: { color: "lblue" },
+        4: { color: "teal" },
+        5: { color: "green" }
+    }>>
+    
+    <<set _plantStageDesc = {
+        wood: ["這裡種植了{plant}。","這裡種植了{plant}，{plant}長出一點了。","這裡種植了{plant}，{plant}正在生長。","這裡種植了{plant}，{plant}快開傘了。","這裡種植了{plant}，{plant}已經開傘了，可以收成了。"],
+        hive: ["這裡準備生產{plant}。","這裡生產{plant}，裏頭有些{plant}。","這裡生產{plant}，裏頭的{plant}半滿了。","這裡生產{plant}，裏頭的{plant}快滿了。","這裡生產{plant}，裏頭的{plant}滿溢而出，可以收成了。"],
+        cow: ["這裡準備生產{plant}。","這裡生產{plant}奶牛的乳房似乎有點膨脹。","這裡生產{plant}奶牛的乳房正在膨脹。","這裡生產{plant}奶牛的乳房正在膨脹，現在有一定規模，即將產奶。","這裡生產{plant}奶牛的乳房膨脹到極限，乳汁順著乳頭滴落，可以擠奶了。"],
+        bird_nest: ["鳥巢裡準備生產{plant}。","鳥巢裡生產{plant}，現在裏頭沒有蛋。","鳥巢裡生產{plant}，現在裏頭沒有蛋。","鳥巢裡生產{plant}，現在裏頭沒有蛋，也許快有了。","鳥巢裡生產{plant}，現在裏頭有許多{plant}。"],
+        chicken: ["雞窩裡準備生產{plant}。","雞窩裡生產{plant}，現在裏頭沒有蛋，也許快有了。","雞窩裡生產{plant}，現在裏頭沒有蛋，也許快有了。","雞窩裡生產{plant}，現在裏頭沒有蛋，也許快有了。","雞窩裡生產{plant}，現在裏頭有許多{plant}。"],
+        oyster: ["珍珠貝裡準備生產{plant}。","珍珠貝裡生產{plant}，現在裏頭有一點像{plant}的東西","珍珠貝裡生產{plant}，現在裏頭有幾個{plant}。","珍珠貝裡生產{plant}，現在裏頭有一些{plant}。","珍珠貝裡生產{plant}，現在裏頭有許多{plant}。"],
+        kitchen: ["萬能料理機裡生產{plant}。","萬能料理機裡生產{plant}，現在正在製作。","萬能料理機裡生產{plant}，現在正在製作。","萬能料理機裡生產{plant}，現在快完成了。","萬能料理機裡生產{plant}，現在已經完成了。"],
+        river: ["水產養殖槽裡生產{plant}。","水產養殖槽裡生產{plant}，現在正在成長。","水產養殖槽裡生產{plant}，現在正在成長。","水產養殖槽裡生產{plant}，現在快可以捕撈了。","水產養殖槽裡生產{plant}，現在非常肥美。"],
+        sea: ["海水槽裡生產{plant}。","海水槽裡生產{plant}，現在正在成長。","海水槽裡生產{plant}，現在正在成長。","海水槽裡生產{plant}，現在快可以捕撈了。","海水槽裡生產{plant}，現在非常肥美。"],
+        human: [
+        {"小瓶装母乳":["像人的奇怪物體長出了乳房。","像人的奇怪物體的乳房似乎有點膨脹。","像人的奇怪物體的乳房正在膨脹。","像人的奇怪物體的乳房正在膨脹，現在有一定規模，即將產奶。","像人的奇怪物體的乳房膨脹到極限，乳汁順著乳頭滴落，可以擠奶了。"]},
+        {"瓶装母乳":["像人的奇怪物體長出了乳房。","像人的奇怪物體的乳房似乎有點膨脹。","像人的奇怪物體的乳房正在膨脹。","像人的奇怪物體的乳房正在膨脹，現在有一定規模，即將產奶。","像人的奇怪物體的乳房膨脹到極限，乳汁順著乳頭滴落，可以擠奶了。"]},
+        {"瓶装精液":["像人的奇怪物體的長出了蛋蛋以及一根棒狀物體。","像人的奇怪物體的蛋蛋似乎有點膨脹。","像人的奇怪物體的蛋蛋正在膨脹。","像人的奇怪物體的蛋蛋正在膨脹，現在有一定規模，快可以榨精了。","像人的奇怪物體的蛋蛋膨脹到極限，棒狀物體高高翹起，精液湧出，可以榨精了。"]}
+        ],
+        default: ["{plant}正在生長。","{plant}正在生長。","{plant}正在生長。","{plant}正在生長。","{plant}正在收成。"]
+    }>>
 
-	<</if>>
+    <<set _careText = {
+        water: { done: "無需特別照顧", pending: "尚未加水" },
+        earth: { done: "已澆水", pending: "尚未澆水" },
+        wood: { done: "已澆水", pending: "尚未澆水" },
+        hive: { done: "已打掃乾淨", pending: "尚未打掃" },
+        cow: { done: "已清理", pending: "尚未清理" },
+        bird_nest: { done: "已打掃並提供必要食物與水", pending: "尚未清理" },
+        chicken: { done: "已打掃並提供必要食物與水", pending: "尚未清理" },
+        oyster: { done: "已給食物", pending: "尚未餵食" },
+        kitchen: { done: "已保養完成", pending: "尚未保養" },
+        river: { done: "已保養並餵食完成", pending: "尚未保養及投喂" },
+        sea: { done: "已保養並餵食完成", pending: "尚未保養及投喂" },
+        human: { done: "已清理乾淨", pending: "尚未清理" }
+    }>>
 
-	<<if $debug is 1 and $_plotsHere.filter(plot => plot.stage > 0 && plot.stage < 5).length gte 1>>
-		<br>
-		<<link "DEBUG: Instagrow all plants here" $passage>><<run tendingInstaGrow(_location)>><</link>>
-		<br>
-	<</if>>
+    <<set _harvestTimes = { small: 5, medium: 15, large: 60 }>>
+    這裡有<span class="gold"><<number $_plotsHere.length>></span>個可使用的設備。
+    <<if $SG_state.fertiliser.current + $SG_state.fertiliser.used gt 0>>
+        你現在有<span class="gold"><<number $SG_state.fertiliser.current>></span>袋特殊原料。
+    <</if>>
+    操作設備的時間會隨著護理技能升高而減少。
+    <br><br>
+          
+    <<set $_i = 1>>
+    <<for _plantbed range $_plotsHere>>
+        <<capture _plantbed>>
+            <span class="gold">第 <<= $_i>> 號設備 (<<SG_display_quality _plantbed>>): </span><br>
+            <<set _plantedPlant = setup.plants[_plantbed.plant]>>
+            <<set _desc = "" >>
+    
+            <<if _plantbed.stage >= 1 && _plantbed.stage <= 5>>
+                <<if _plantbed.bed is "human">>
+                    <<set _matched = _plantStageDesc.human.find(obj => obj[_plantedPlant.plural])>>
+                    <<if _matched && _matched[_plantedPlant.plural][_plantbed.stage-1]>>
+                        <<set _desc = _matched[_plantedPlant.plural][_plantbed.stage-1]>>
+                    <<else>>
+                        <<set _desc = (_plantStageDesc.default[_plantbed.stage-1] || "{plant}正在生長。").replace(/{plant}/g, _plantedPlant.plural)>>
+                    <</if>>
+                <<else>>
+                    <<set _bedDesc = _plantStageDesc[_plantbed.bed] || _plantStageDesc.default>>
+                    <<set _desc = (_bedDesc[_plantbed.stage-1] || "{plant}正在生長。").replace(/{plant}/g, _plantedPlant.plural)>>
+                <</if>>
+                <<= _desc>><br>
+            <<else>>
+                <<if _plantbed.till gte 1>>
+                    設備已準備好生產。
+                    <br>
+                    <<SG_tendingPlantSeedsOptions _location _plantbed>>
+                <<else>>
+                    設備生產前準備。
+                    <br>
+                    <<SG_tendingTillOptions _plantbed>>
+                <</if>>
+            <</if>>
+    
+            <<if _plantbed.stage gte 5>>
+                <<set _pass = _harvestTimes[_plantbed.size] || 60>>
+                <<set _timeStr = getTimeString(_pass)>>
+                <<if $leftarm is "bound" and $rightarm is "bound">>
+                    <span class="red">你的手臂被捆绑住，無法操作。</span>
+                <<else>>
+                    <<if $options.images is 1 and _plantedPlant.icon>>
+                        <img class="tending_icon" @src="`img/misc/icon/tending/` + _plantedPlant.icon">
+                    <</if>>
+                    <<link "收成 (_timeStr)" $passage>>
+                        <<pass _pass>><<SG_tending_harvest _plantbed>><<SG_clear_plot _plantbed>>
+                    <</link>>
+                <</if>>
+                <br>
+            <</if>>
+
+            <<if _plantbed.stage gte 1 and _plantbed.stage lt 5>>
+                <<set _care = _careText[_plantbed.bed] || {done: "已完成", pending: "尚未完成"}>>
+                <<if _plantbed.water is 1>>
+                    <span class="green"><<= _care.done>></span>
+                <<else>>
+                    <span class="purple"><<= _care.pending>></span><br>
+                    <<SG_tendingWaterPlot _plantbed>>
+                <</if>>
+                <br>
+            <</if>>
+        <</capture>>
+        <<set $_i++>>
+    <</for>>
+
+    <<set _water_needed = $_plotsHere.filter(plot => plot.stage >= 1 && plot.stage < 5 && plot.bed !== "water" && plot.water === 0).length>>
+    <<if _water_needed gte 1>>
+        <<set _plotsToWater = $_plotsHere.filter(plot => plot.stage >= 1 && plot.stage < 5 && plot.bed !== "water" && plot.water === 0)>>
+        <<set _totalTimeToWater = 0>>
+        <<run _plotsToWater.forEach(plot => _totalTimeToWater += setup.tending.wateringTimes[plot.size])>>
+        <<set $_time = getTimeString(_totalTimeToWater)>>
+
+        <<if !($leftarm is "bound" and $rightarm is "bound")>>
+            <<gardenicon "water">>
+            <<link "給所有設備加水 ($_time)" $passage>>
+                <<SG_tendingWaterAllDryBeds _plotsToWater>><<tiredness _water_needed>><<physique _water_needed>><<tending _water_needed>>
+            <</link>><<gtiredness>><<gtending>>
+        <</if>>
+        <br>
+    <</if>>
+
+    <<if $debug is 1 and $_plotsHere.filter(plot => plot.stage > 0 && plot.stage < 5).length gte 1>>
+        <br>
+        <<link "DEBUG: Instagrow all plants here" $passage>>
+            <<run tendingInstaGrow(_location)>>
+        <</link>>
+        <br>
+    <</if>>
 <</widget>>
 
 <<widget "SG_tendingWaterPlot">>
@@ -547,37 +417,7 @@
 		<<case "farm">> <<set _irrigation to ($farm.irrigation ? $farm.irrigation : 0)>>
 		<<default>> <<set _irrigation to 0>>
 	<</switch>>
-	<!--舊版顯示可種植選項邏輯，會將所有種植的選項皆顯示（不能種植的提示種植土壤）
-	<<for _plantType range $plants_known>>
-		<br>
-		<<set $_plant to setup.plants[_plantType]>>
-		<<if $_plant.season.includes(Time.season) or (_location is "strangeGarden") or (_location is "garden" and $alex_greenhouse gte 3)>>
-			/* comparing soil types; check if target bed is compatible with the seed's soil type */
-			<<if $_plant.bed is _plantbed.bed>>
-				<<switch _plantbed.size>>
-					<<case "small">><<set _passTime to 30>>
-					<<case "medium">><<set _passTime to 90>>
-					<<default>><<set _passTime to 180>>
-				<</switch>>
-				<<set $_timeString to getTimeString(_passTime)>>
-				<<capture _passTime _plantbed _plantType>>
-					<<if $options.images is 1 and $_plant.icon>>
-						<img class="tending_icon" @src="`img/misc/icon/tending/` + $_plant.icon">
-					<</if>>
-					<<link "生產$_plant.plural ($_timeString)" $passage>><<pass _passTime>><<run plantSeedsInPlot(_plantbed, _plantType)>><</link>>
-				<</capture>>
-				<<if $statdisable is "f">>
-					<span class="orange">(<<print $_plant.days>>天)</span>
-				<</if>>
-			<<else>>
-				<span class="blue"><<print $_plant.plural>>仅能于<<print $_plant.bed.replace("earth","土地里").replace("water","水池中").replace("wood","木頭上").replace("hive","蜂箱裡").replace("cow","長得像奶牛乳房的奇怪物體上").replace("bird_nest","奇怪的鳥巢中").replace("human","長得像人的奇怪物體裡").replace("chicken","雞窩裡").replace("oyster","水塘邊的珍珠貝").replace("kitchen","萬能料理機").replace("river","水產養殖槽").replace("sea","海水槽")>>生產。</span>
-			<</if>>
-		<<else>>
-			<<tending_season_notice $_plant>>
-		<</if>>
-
-	<</for>>
-	-->
+	
 	<!--僅顯示當前土壤可種植之產品，當無任何產品時顯示提示-->
     <<set _foundValidPlant to false>>  /* 追蹤是否有可種植的作物 */
     <<set _invalidPlants to "">>  /* 存儲不可種植作物的 HTML */
@@ -756,7 +596,9 @@
 			<br>
 		<</if>>	
 	<</if>>
+	
 	<<run unsetTendingVars()>>
+	
 <</widget>>
 
 <<widget "SG_tending_day">>
@@ -788,42 +630,68 @@
 <</widget>>
 
 <<widget "SG_tending_harvest">>
-	/* Argument is the plot you want to harvest */
-	<<set $_plot to _args[0]>>
-	<<set $_type to $_plot.plant>>
-	<<if $plants[$_type] is undefined>>
-		<<set $plants[$_type] to {"name": setup.plants[$_type].name, "plural": setup.plants[$_type].plural, "amount": 0}>>
-	<<elseif $plants[$_type].name is undefined>>
-		<<set $plants[$_type] to {"name": setup.plants[$_type].name, "plural": setup.plants[$_type].plural, "amount": $plants[$_type].amount}>>
-	<</if>>
-	<<switch $_plot.size>>
-		<<case "small">> <<set _tending_amount to random(10, (currentSkillValue('tending') / 20) + 10)>>
-		<<case "medium">> <<set _tending_amount to random(10, (currentSkillValue('tending') / 10) + 20)>>
-		<<default>> <<set _tending_amount to random(10, (currentSkillValue('tending') / 2) + 50)>>
-	<</switch>>
-	<<set _tending_amount *= setup.plants[$_type].multiplier>>
-	<<switch Math.clamp($_plot.quality, 1, 4)>>
-		<<case 4>> <<set _tending_amount *= 1.6>>
-		<<case 3>> <<set _tending_amount *= 1.4>>
-		<<case 2>> <<set _tending_amount *= 1.2>>
-	<</switch>>
-	<<if !$backgroundTraits.includes("greenthumb") and $tending is 1000 and $plants_known.length gte 16 and
-	($SG_state.fertiliser.used gte 40 or ($SG_state.fertiliser.used gte 25 and $farm_stage gte 6))>>
-		<<run $backgroundTraits.pushUnique("greenthumb")>>
-		<span class="gold">花大量的时间在土地上劳作会让你成为园艺大师。</span>
-		<br>
-	<</if>>
-	<<if $backgroundTraits.includes("greenthumb")>>
-		<<set _tending_amount *= 1.2>>
-	<</if>>
-	<<set _tending_amount *= $tending_yield_factor>>
+    /* Argument is the plot you want to harvest */
+    <<set $_plot to _args[0]>>
+    <<set $_type to $_plot.plant>>
 
-	<<set _tending_amount to Math.trunc(_tending_amount)>>
-	<<set $plants[$_type].amount += _tending_amount>>
+    /* 初始化植物資料 */
+    <<if $plants[$_type] is undefined>>
+        <<set $plants[$_type] to {
+            "name": setup.plants[$_type].name,
+            "plural": setup.plants[$_type].plural,
+            "amount": 0,
+            "cummilkamount": 0
+        }>>
+    <<elseif $plants[$_type].name is undefined>>
+        <<set $plants[$_type] to {
+            "name": setup.plants[$_type].name,
+            "plural": setup.plants[$_type].plural,
+            "amount": $plants[$_type].amount,
+            "cummilkamount": $plants[$_type].cummilkamount
+        }>>
+    <</if>>
 
-	<<set $tendingvars.harvest to true>>
-	<<set $tendingvars.harvest_amount to _tending_amount>>
-	<<set $tendingvars.harvest_name to setup.plants[$_type].plural>>
+    /* 計算基礎產量 */
+    <<switch $_plot.size>>
+        <<case "small">> <<set _tending_amount to random(10, (currentSkillValue('tending') / 20) + 10)>>
+        <<case "medium">> <<set _tending_amount to random(10, (currentSkillValue('tending') / 10) + 20)>>
+        <<default>> <<set _tending_amount to random(10, (currentSkillValue('tending') / 2) + 50)>>
+    <</switch>>
+
+    <<set _tending_amount *= setup.plants[$_type].multiplier>>
+
+    /* 根據品質加成 */
+    <<switch Math.clamp($_plot.quality, 1, 4)>>
+        <<case 4>> <<set _tending_amount *= 1.6>>
+        <<case 3>> <<set _tending_amount *= 1.4>>
+        <<case 2>> <<set _tending_amount *= 1.2>>
+    <</switch>>
+
+    /* greenthumb 判定保持原本 $SG_state.fertiliser.used */
+    <<if !$backgroundTraits.includes("greenthumb") and $tending is 1000 and $plants_known.length gte 16 and
+        ($SG_state.fertiliser.used gte 40 or ($SG_state.fertiliser.used gte 25 and $farm_stage gte 6))>>
+        <<run $backgroundTraits.pushUnique("greenthumb")>>
+        <span class="gold">花大量的时间在土地上劳作会让你成为园艺大师。</span>
+        <br>
+    <</if>>
+
+    <<if $backgroundTraits.includes("greenthumb")>>
+        <<set _tending_amount *= 1.2>>
+    <</if>>
+
+    /* 使用新版的最終 yield 乘數 */
+    <<set _tending_amount *= $settings.tendingYieldModifier>>
+
+    /* 取整數 */
+    <<set _tending_amount to Math.trunc(_tending_amount)>>
+
+    /* 更新植物數量 */
+    <<set $plants[$_type].amount += _tending_amount>>
+
+    /* 設定收割變數 */
+    <<set $tendingvars.harvest to true>>
+    <<set $tendingvars.harvest_amount to _tending_amount>>
+    <<set $tendingvars.harvest_name to setup.plants[$_type].plural>>
 <</widget>>
 
 <<widget "SG_tending_pick">>
