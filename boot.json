@@ -1,10 +1,13 @@
 {
   "name": "StrangeGarden",
-  "version": "0.20",
+  "version": "0.20.1",
   "styleFileList": [],
   "scriptFileList": [
+    "js/SGOldPlants.js",
+    "js/SGcustomPlants.js",
     "js/SG_foodstuff_compat.js",
-    "js/SGOldPlants.js"
+    "js/SG_foodstuff_debugHelper.js"
+    
     ],
   "scriptFileList_preload":[
     "js/stg.js"],
