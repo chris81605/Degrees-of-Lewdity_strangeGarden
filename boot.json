@@ -1,10 +1,16 @@
 {
   "name": "StrangeGarden",
-  "version": "0.14.2",
+  "version": "0.20",
   "styleFileList": [],
-  "scriptFileList": [],
-  "scriptFileList_preload":["js/stg.js"],
-  "scriptFileList_inject_early": ["js/framework_detector.js"],
+  "scriptFileList": [
+    "js/SG_foodstuff_compat.js",
+    "js/SGOldPlants.js"
+    ],
+  "scriptFileList_preload":[
+    "js/stg.js"],
+  "scriptFileList_inject_early": [
+    "js/framework_detector.js"    
+    ],
   "tweeFileList": [
     "twee/strangeGarden.twee",
     "twee/strangeGarden_buy.twee",
