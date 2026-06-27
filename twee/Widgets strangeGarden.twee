@@ -64,118 +64,6 @@
 	<<set $_plot.stage to 0>>
 <</widget>>
 
-<!--
-<<widget "SG_display_quality">><<silently>>
-	<<set $_plot to _args[0]>>
-	<<switch $_plot.bed>>
-		<<case "water">><<set _bedType to "池子">>
-		<<case "earth">><<set _bedType to "土壤">>
-		<<case "wood">><<set _bedType to "木頭">>
-		<<case "hive">><<set _bedType to "蜂箱">>
-		<<case "cow">><<set _bedType to "長得像奶牛乳房的奇怪物體">>
-		<<case "bird_nest">><<set _bedType to "樹上的鳥巢">>
-		<<case "human">><<set _bedType to "長得像人的奇怪物體">>
-		<<case "oyster">><<set _bedType to "水塘邊的珍珠貝">>
-		<<case "chicken">><<set _bedType to "田邊的放山雞">>
-		<<case "kitchen">><<set _bedType to "萬能料理機">>
-		<<case "river">><<set _bedType to "水產養殖槽">>
-		<<case "sea">><<set _bedType to "海水槽">>
-		<<default>><<set _bedType to clone($_plot.bed)>>
-	<</switch>>
-	<<if $_plot.bed is "wood">>
-		<<switch Math.clamp($_plot.quality, 0, 4)>>
-			<<case 1>> <<set $_result to `<span class="blue">破爛的`+_bedType+`</span>`>>
-			<<case 2>> <<set $_result to `<span class="lblue">普通的`+_bedType+`</span>`>>
-			<<case 3>> <<set $_result to `<span class="teal">優良的`+_bedType+`</span>`>>
-			<<case 4>><<set $_result to `<span class="green">上好的`+_bedType+`</span>`>>
-			<<default>> <<set $_result to `<span class="red">错误</span>`>>
-		<</switch>>
-	<<elseif $_plot.bed is "hive">>
-		<<switch Math.clamp($_plot.quality, 0, 4)>>
-			<<case 1>> <<set $_result to `<span class="blue">迷你的`+_bedType+`</span>`>>
-			<<case 2>> <<set $_result to `<span class="lblue">小的`+_bedType+`</span>`>>
-			<<case 3>> <<set $_result to `<span class="teal">中等的`+_bedType+`</span>`>>
-			<<case 4>><<set $_result to `<span class="green">特大的`+_bedType+`</span>`>>
-			<<default>> <<set $_result to `<span class="red">错误</span>`>>
-		<</switch>>
-	<<elseif $_plot.bed is "cow">>
-		<<switch Math.clamp($_plot.quality, 0, 4)>>
-			<<case 1>> <<set $_result to `<span class="blue">瘦弱的`+_bedType+`</span>`>>
-			<<case 2>> <<set $_result to `<span class="lblue">普通的`+_bedType+`</span>`>>
-			<<case 3>> <<set $_result to `<span class="teal">碩大的`+_bedType+`</span>`>>
-			<<case 4>><<set $_result to `<span class="green">無與倫比的`+_bedType+`</span>`>>
-			<<default>> <<set $_result to `<span class="red">错误</span>`>>
-		<</switch>>
-	<<elseif $_plot.bed is "bird_nest">>
-		<<switch Math.clamp($_plot.quality, 0, 4)>>
-			<<case 1>> <<set $_result to `<span class="blue">一個`+_bedType+`</span>`>>
-			<<case 2>> <<set $_result to `<span class="lblue">幾個`+_bedType+`</span>`>>
-			<<case 3>> <<set $_result to `<span class="teal">很多個`+_bedType+`</span>`>>
-			<<case 4>><<set $_result to `<span class="green">無數個`+_bedType+`</span>`>>
-			<<default>> <<set $_result to `<span class="red">错误</span>`>>
-		<</switch>>
-	<<elseif $_plot.bed is "chicken">>
-		<<switch Math.clamp($_plot.quality, 0, 4)>>
-			<<case 1>> <<set $_result to `<span class="blue">一隻`+_bedType+`</span>`>>
-			<<case 2>> <<set $_result to `<span class="lblue">幾隻`+_bedType+`</span>`>>
-			<<case 3>> <<set $_result to `<span class="teal">很多隻`+_bedType+`</span>`>>
-			<<case 4>><<set $_result to `<span class="green">無數隻`+_bedType+`</span>`>>
-			<<default>> <<set $_result to `<span class="red">错误</span>`>>
-		<</switch>>	
-	<<elseif $_plot.bed is "human">>
-		<<switch Math.clamp($_plot.quality, 0, 4)>>
-			<<case 1>> <<set $_result to `<span class="blue">_bedType</span>`>>
-			<<case 2>> <<set $_result to `<span class="lblue">普通的`+_bedType+`</span>`>>
-			<<case 3>> <<set $_result to `<span class="teal">良好的`+_bedType+`</span>`>>
-			<<case 4>><<set $_result to `<span class="green">優良的`+_bedType+`</span>`>>
-			<<default>> <<set $_result to `<span class="red">错误</span>`>>
-		<</switch>>
-	<<elseif $_plot.bed is "oyster">>
-		<<switch Math.clamp($_plot.quality, 0, 4)>>
-			<<case 1>> <<set $_result to `<span class="blue">_bedType</span>`>>
-			<<case 2>> <<set $_result to `<span class="lblue">普通的`+_bedType+`</span>`>>
-			<<case 3>> <<set $_result to `<span class="teal">良好的`+_bedType+`</span>`>>
-			<<case 4>><<set $_result to `<span class="green">優良的`+_bedType+`</span>`>>
-			<<default>> <<set $_result to `<span class="red">错误</span>`>>
-		<</switch>>
-	<<elseif $_plot.bed is "kitchen">>
-		<<switch Math.clamp($_plot.quality, 0, 4)>>
-			<<case 1>> <<set $_result to `<span class="blue">_bedType</span>`>>
-			<<case 2>> <<set $_result to `<span class="lblue">普通的`+_bedType+`</span>`>>
-			<<case 3>> <<set $_result to `<span class="teal">改良的`+_bedType+`</span>`>>
-			<<case 4>><<set $_result to `<span class="green">頂級的`+_bedType+`</span>`>>
-			<<default>> <<set $_result to `<span class="red">错误</span>`>>
-		<</switch>>
-	<<elseif $_plot.bed is "river">>
-		<<switch Math.clamp($_plot.quality, 0, 4)>>
-			<<case 1>> <<set $_result to `<span class="blue">_bedType</span>`>>
-			<<case 2>> <<set $_result to `<span class="lblue">普通的`+_bedType+`</span>`>>
-			<<case 3>> <<set $_result to `<span class="teal">改良的`+_bedType+`</span>`>>
-			<<case 4>><<set $_result to `<span class="green">頂級的`+_bedType+`</span>`>>
-			<<default>> <<set $_result to `<span class="red">错误</span>`>>
-		<</switch>>
-	<<elseif $_plot.bed is "sea">>
-		<<switch Math.clamp($_plot.quality, 0, 4)>>
-			<<case 1>> <<set $_result to `<span class="blue">_bedType</span>`>>
-			<<case 2>> <<set $_result to `<span class="lblue">普通的`+_bedType+`</span>`>>
-			<<case 3>> <<set $_result to `<span class="teal">改良的`+_bedType+`</span>`>>
-			<<case 4>><<set $_result to `<span class="green">頂級的`+_bedType+`</span>`>>
-			<<default>> <<set $_result to `<span class="red">错误</span>`>>
-		<</switch>>						
-	<<else>>
-		<<switch Math.clamp($_plot.quality, 0, 4)>>
-			<<case 1>> <<set $_result to `<span class="blue">贫瘠的`+_bedType+`</span>`>>
-			<<case 2>> <<set $_result to `<span class="lblue">普通的`+_bedType+`</span>`>>
-			<<case 3>> <<set $_result to `<span class="teal">肥沃的`+_bedType+`</span>`>>
-			<<case 4>><<set $_result to `<span class="green">沃腴的`+_bedType+`</span>`>>
-			<<default>> <<set $_result to `<span class="red">错误</span>`>>
-		<</switch>>
-	<</if>>
-<</silently>><<print $_result>>
-
-<</widget>>
--->
-
 <<widget "SG_display_quality">>
     <<silently>>
     <<set _plot = _args[0]>>
@@ -406,6 +294,54 @@
 	<<set $tendingvars.all_plots_watered to true>>
 <</widget>>
 
+<<widget "SG_tendingPlantSeedsOptionsList">>
+	<<set _location to _args[0]>>
+	<<set _plantbed to _args[1]>>
+	<<set _invalidPlantsRef to _args[2]>>
+
+	<<for _plantType range $plants_known>>
+		<<set $_plant to setup.plants[_plantType]>>
+
+		<<if $_plant is undefined>>
+			<<continue>>
+		<</if>>
+
+		<<if $_plant.season is undefined>>
+			<<continue>>
+		<</if>>
+
+		<<if $_plant.season.includes(Time.season) or (_location is "strangeGarden") or (_location is "garden" and $alex_greenhouse gte 3)>>
+			<<if $_plant.bed is _plantbed.bed>>
+				<<switch _plantbed.size>>
+					<<case "small">>
+						<<set _passTime to 30>>
+					<<case "medium">>
+						<<set _passTime to 90>>
+					<<default>>
+						<<set _passTime to 180>>
+				<</switch>>
+
+				<<set $_timeString to getTimeString(_passTime)>>
+
+				<<capture _passTime _plantbed _plantType>>
+					<<if $options.images is 1 and $_plant.icon>>
+						<img class="tending_icon" @src="setup.SG_FoodCompat.iconPath(_plantType)">
+					<</if>>
+					<<link "生產 $_plant.plural ($_timeString)" $passage>>
+						<<pass _passTime>>
+						<<run plantSeedsInPlot(_plantbed, _plantType)>>
+					<</link>>
+				<</capture>>
+
+				<<if $statdisable is "f">>
+					<span class="orange">(<<print $_plant.days>> 天)</span>
+				<</if>>
+				<br>
+			<</if>>
+		<</if>>
+	<</for>>
+<</widget>>
+
 <<widget "SG_tendingPlantSeedsOptions">>
 	<<set _location to _args[0]>>
 	<<set _plantbed to _args[1]>>
@@ -413,72 +349,44 @@
 	<<if $plants_known.length is 0>>
 		在野外寻找种子种植，或取得產品。
 	<</if>>
+
 	<<switch _location>>
-		<<case "farm">> <<set _irrigation to ($farm.irrigation ? $farm.irrigation : 0)>>
-		<<default>> <<set _irrigation to 0>>
+		<<case "farm">>
+			<<set _irrigation to ($farm.irrigation ? $farm.irrigation : 0)>>
+		<<default>>
+			<<set _irrigation to 0>>
 	<</switch>>
-	
-	<!--僅顯示當前土壤可種植之產品，當無任何產品時顯示提示-->
-    <<set _foundValidPlant to false>>  /* 追蹤是否有可種植的作物 */
-    <<set _invalidPlants to "">>  /* 存儲不可種植作物的 HTML */
 
-    <<for _plantType range $plants_known>>
-        <<set $_plant to setup.plants[_plantType]>>
-        <<if $_plant.season.includes(Time.season) or (_location is "strangeGarden") or (_location is "garden" and $alex_greenhouse gte 3)>>
-            <<if $_plant.bed is _plantbed.bed>>  /* 檢查土壤類型 */
-                <<set _foundValidPlant to true>>  /* 記錄至少有一個可種植的作物 */
-            
-                <<switch _plantbed.size>>
-                    <<case "small">><<set _passTime to 30>>
-                    <<case "medium">><<set _passTime to 90>>
-                    <<default>><<set _passTime to 180>>
-                <</switch>>
-                <<set $_timeString to getTimeString(_passTime)>>
-            
-                <<capture _passTime _plantbed _plantType>>
-                    <<if $options.images is 1 and $_plant.icon>>
-                        <img class="tending_icon" @src="setup.SG_FoodCompat.iconPath(_plantType)">
-                    <</if>>
-                    <<link "生產 $_plant.plural ($_timeString)" $passage>>
-                        <<pass _passTime>>
-                        <<run plantSeedsInPlot(_plantbed, _plantType)>>
-                 <</link>>
-                <</capture>>
-            
-                <<if $statdisable is "f">>
-                    <span class="orange">(<<print $_plant.days>> 天)</span>
-                <</if>>
-                <br>
-            <<else>>
-                /* 存儲不可種植作物的 HTML，稍後在折疊區塊內顯示 */
-                <<set _invalidPlants to _invalidPlants + `
-                    <div>
-                        <strong>` + $_plant.plural + `</strong> 僅能於 
-                        <spen class="gold">` + $_plant.bed.replace("earth","土地里").replace("water","水池中").replace("wood","木頭上")
-                            .replace("hive","蜂箱裡").replace("cow","長得像奶牛乳房的奇怪物體上")
-                            .replace("bird_nest","奇怪的鳥巢中").replace("human","長得像人的奇怪物體裡")
-                            .replace("chicken","雞窩裡").replace("oyster","水塘邊的珍珠貝")
-                            .replace("kitchen","萬能料理機").replace("river","水產養殖槽").replace("sea","海水槽")
-                        + `</spen>生產。
-                    </div>
-                `>>
-            <</if>>
-        <</if>>
-    <</for>>
+	<<set _invalidPlants to "">>
+	<<set _collapseLimit to 8>>
 
-    <<if not _foundValidPlant>>
-        <p class="red">目前沒有任何可生產的物品。</p>
-    <</if>>
+	<<set _validCount to $plants_known.filter(id => {
+		const p = setup.plants[id];
+		return p &&
+			p.season &&
+			(
+				p.season.includes(Time.season) ||
+				_location === "strangeGarden" ||
+				(_location === "garden" && $alex_greenhouse >= 3)
+			) &&
+			p.bed === _plantbed.bed;
+	}).length>>
 
-    /* 折疊區塊：顯示所有不可種植作物 */
-    <<if _invalidPlants isnot "" and $debug == 1>>
-        <details>
-            <summary>▷查看不可生產的物品</summary>
-            <div class="invalid-plants">
-                <<print _invalidPlants>>
-            </div>
-        </details>
-    <</if>>	
+	<<if _validCount is 0>>
+		<p class="red">目前沒有任何可生產的物品。</p>
+	<<elseif _validCount gt _collapseLimit>>
+		<details>
+			<summary>
+	            <span class="gold">可生產物品</span>
+	            <span class="green"><<= _validCount>></span> 種
+	            <span class="lblue">（點此展開）</span>
+            </summary>
+			<<SG_tendingPlantSeedsOptionsList _location _plantbed>>
+		</details>
+	<<else>>
+		<<SG_tendingPlantSeedsOptionsList _location _plantbed>>
+	<</if>>
+
 	<br>
 <</widget>>
 
