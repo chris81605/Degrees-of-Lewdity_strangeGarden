@@ -8,7 +8,7 @@
                 const simpleMod = window.modUtils.getMod('Simple Frameworks');
 
                 if (maplebirchMod) {
-                    maplebirchFrameworks.addto('CustomLinkZone', {
+                    maplebirch.tool.addTo('CustomLinkZone', {
                         widget: [1, 'strangeGarden_link'], // 在链接位置2前插入
                         passage: ['Elk Street'],
                     });

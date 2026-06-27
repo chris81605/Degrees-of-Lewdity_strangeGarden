@@ -38,7 +38,7 @@
         {
             async afterInjectEarlyLoad() {
                 if (modUtils.getMod('maplebirch')) {
-                    if (compareVersions(modUtils.getMod('maplebirch').version, "2.4.3") === 0) {
+                    if (compareVersions(modUtils.getMod('maplebirch').version, "3.2.5") === 0) {
                         await waitForUserResponse({
 							title: 'maplebirch框架版本過低！',
 							icon: "warning",
@@ -49,7 +49,7 @@
 									background-clip: text;
 									-webkit-background-clip: text;
 									color: transparent;
-								">StrangeGarden</span>所有功能正常，建議將其更新至v2.4.3版本或以上。<br>
+								">StrangeGarden</span>所有功能正常，建議將其更新至v3.2.5版本或以上。<br>
 								<br>
 								你可以從<a href="https://github.com/MaplebirchLeaf/SCML-DOL-maplebirchframework" target="_blank">【秋枫白桦框架】模組的Github頁面</a>更新這個模組。<br>
 								<br>
