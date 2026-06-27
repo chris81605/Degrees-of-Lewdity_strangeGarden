@@ -1,4 +1,8 @@
 :: strangeGarden
+<<if setup.SG_FoodCompat>>
+    <<run setup.SG_FoodCompat.init()>>
+<</if>>
+
 <<effects>>
 <<SG_plot_effects>>
 

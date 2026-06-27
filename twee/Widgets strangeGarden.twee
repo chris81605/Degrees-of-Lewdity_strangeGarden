@@ -290,7 +290,7 @@
     <<for _plantbed range $_plotsHere>>
         <<capture _plantbed>>
             <span class="gold">第 <<= $_i>> 號設備 (<<SG_display_quality _plantbed>>): </span><br>
-            <<set _plantedPlant = setup.plants[_plantbed.plant]>>
+            <<set _plantedPlant = setup.SG_FoodCompat.getPlant(_plantbed.plant)>>
             <<set _desc = "" >>
     
             <<if _plantbed.stage >= 1 && _plantbed.stage <= 5>>
@@ -325,7 +325,7 @@
                     <span class="red">你的手臂被捆绑住，無法操作。</span>
                 <<else>>
                     <<if $options.images is 1 and _plantedPlant.icon>>
-                        <img class="tending_icon" @src="`img/misc/icon/tending/` + _plantedPlant.icon">
+                        <img class="tending_icon" @src="setup.SG_FoodCompat.iconPath(_plantbed.plant)">
                     <</if>>
                     <<link "收成 (_timeStr)" $passage>>
                         <<pass _pass>><<SG_tending_harvest _plantbed>><<SG_clear_plot _plantbed>>
@@ -437,7 +437,7 @@
             
                 <<capture _passTime _plantbed _plantType>>
                     <<if $options.images is 1 and $_plant.icon>>
-                        <img class="tending_icon" @src="`img/misc/icon/tending/` + $_plant.icon">
+                        <img class="tending_icon" @src="setup.SG_FoodCompat.iconPath(_plantType)">
                     <</if>>
                     <<link "生產 $_plant.plural ($_timeString)" $passage>>
                         <<pass _passTime>>
@@ -634,7 +634,17 @@
     <<set $_plot to _args[0]>>
     <<set $_type to $_plot.plant>>
 
-    /* 初始化植物資料 */
+    /*
+     * 初始化植物資料。
+     *
+     * 舊版：
+     * - $plants 是正式背包倉庫。
+     *
+     * 新版：
+     * - $plants 只作為舊 widget 的暫存資料。
+     * - 實際收成數量會由 setup.SG_FoodCompat.addHarvest()
+     *   寫入 $foodstuff。
+     */
     <<if $plants[$_type] is undefined>>
         <<set $plants[$_type] to {
             "name": setup.plants[$_type].name,
@@ -653,21 +663,40 @@
 
     /* 計算基礎產量 */
     <<switch $_plot.size>>
-        <<case "small">> <<set _tending_amount to random(10, (currentSkillValue('tending') / 20) + 10)>>
-        <<case "medium">> <<set _tending_amount to random(10, (currentSkillValue('tending') / 10) + 20)>>
-        <<default>> <<set _tending_amount to random(10, (currentSkillValue('tending') / 2) + 50)>>
+        <<case "small">>
+            <<set _tending_amount to random(10, (currentSkillValue('tending') / 20) + 10)>>
+        <<case "medium">>
+            <<set _tending_amount to random(10, (currentSkillValue('tending') / 10) + 20)>>
+        <<default>>
+            <<set _tending_amount to random(10, (currentSkillValue('tending') / 2) + 50)>>
     <</switch>>
 
+    /*
+     * 套用作物產量倍率。
+     *
+     * 舊版來源：
+     * - setup.plants[id].multiplier
+     *
+     * 新版來源：
+     * - setup.foodstuff[id].tending.yield_multiplier
+     * - 已由 SG_FoodCompat 轉換成 setup.plants[id].multiplier
+     */
     <<set _tending_amount *= setup.plants[$_type].multiplier>>
 
-    /* 根據品質加成 */
+    /* 根據設備品質加成產量 */
     <<switch Math.clamp($_plot.quality, 1, 4)>>
-        <<case 4>> <<set _tending_amount *= 1.6>>
-        <<case 3>> <<set _tending_amount *= 1.4>>
-        <<case 2>> <<set _tending_amount *= 1.2>>
+        <<case 4>>
+            <<set _tending_amount *= 1.6>>
+        <<case 3>>
+            <<set _tending_amount *= 1.4>>
+        <<case 2>>
+            <<set _tending_amount *= 1.2>>
     <</switch>>
 
-    /* greenthumb 判定保持原本 $fertiliser.used */
+    /*
+     * greenthumb 特質判定。
+     * 這段保持原本邏輯，仍使用 $fertiliser.used / $plants_known。
+     */
     <<if !$backgroundTraits.includes("greenthumb") and $tending is 1000 and $plants_known.length gte 16 and
         ($fertiliser.used gte 40 or ($fertiliser.used gte 25 and $farm_stage gte 6))>>
         <<run $backgroundTraits.pushUnique("greenthumb")>>
@@ -675,87 +704,116 @@
         <br>
     <</if>>
 
+    /* greenthumb 已取得時，收成額外增加 */
     <<if $backgroundTraits.includes("greenthumb")>>
         <<set _tending_amount *= 1.2>>
     <</if>>
 
-    /* 使用新版的最終 yield 乘數 */
+    /*
+     * 套用遊戲設定中的最終產量倍率。
+     * 新版遊戲通常使用 $settings.tendingYieldModifier。
+     */
     <<set _tending_amount *= $settings.tendingYieldModifier>>
 
-    /* 取整數 */
+    /* 產量取整數，避免出現小數數量 */
     <<set _tending_amount to Math.trunc(_tending_amount)>>
 
-    /* 更新植物數量 */
-    <<set $plants[$_type].amount += _tending_amount>>
+    /*
+     * 更新收成數量。
+     *
+     * 舊版：
+     * - addHarvest() 會寫入 $plants[$_type].amount。
+     *
+     * 新版：
+     * - addHarvest() 會寫入 $foodstuff[$_type].amount。
+     * - clearTempPlant() 會清除 $plants[$_type] 暫存，
+     *   避免新版存檔殘留舊版資料造成異常。
+     */
+    <<run setup.SG_FoodCompat.addHarvest($_type, _tending_amount)>>
+    <<run setup.SG_FoodCompat.clearTempPlant($_type)>>
 
-    /* 設定收割變數 */
+    /* 設定收割後提示用變數 */
     <<set $tendingvars.harvest to true>>
     <<set $tendingvars.harvest_amount to _tending_amount>>
     <<set $tendingvars.harvest_name to setup.plants[$_type].plural>>
 <</widget>>
 
 <<widget "SG_tending_pick">>
-	/*
+    /*
 	* First argument: plant type.
 	* Second argument: minimum number picked.
 	* Third argument: maximum number picked.
 	*/
-	<<set $_type to _args[0]>>
-	<<if $plants[$_type] is undefined>>
-		<<set $plants[$_type] to {"name": setup.plants[$_type].name, "plural": setup.plants[$_type].plural, "amount": 0}>>
-	<<elseif $plants[$_type].name is undefined>>
-		<<set $plants[$_type] to {"name": setup.plants[$_type].name, "plural": setup.plants[$_type].plural, "amount": $plants[$_type].amount}>>
-	<</if>>
+    <<set $_type to _args[0]>>
 
-	<<if _args[2] gte 1>>
-		<<set _tending_amount to random(_args[1], _args[2])>>
-	<<else>>
-		<<set _tending_amount to random(1, 5)>>
-	<</if>>
+    <<if $plants[$_type] is undefined>>
+        <<set $plants[$_type] to {"name": setup.plants[$_type].name, "plural": setup.plants[$_type].plural, "amount": 0}>>
+    <<elseif $plants[$_type].name is undefined>>
+        <<set $plants[$_type] to {"name": setup.plants[$_type].name, "plural": setup.plants[$_type].plural, "amount": $plants[$_type].amount}>>
+    <</if>>
 
-	<<if !setup.plants[$_type].special.includes("large") and setup.plants[$_type].bed isnot "bird_nest">>
-		<<set _tending_amount *= (1 + (currentSkillValue('tending') / 1000))>>
-	<</if>>
-	<<if $backgroundTraits.includes("greenthumb")>>
-		<<set _tending_amount *= 1.2>>
-	<</if>>
-	<<set _tending_amount to Math.trunc(_tending_amount)>>
-	<<set $plants[$_type].amount += _tending_amount>>
-	<<set $wild_plant_stat += _tending_amount>>
+    <<if _args[2] gte 1>>
+        <<set _tending_amount to random(_args[1], _args[2])>>
+    <<else>>
+        <<set _tending_amount to random(1, 5)>>
+    <</if>>
 
-	你拿起
-	<<if $_type is "bird_egg">>
-		了
-	<</if>>
-	<<if _tending_amount is 1>>
-		<<if (["a","e","i","o","u","A","E","I","O","U"].some(letter => $_type.startsWith(letter)))>>
-			一个
-		<<else>>
-			一个
-		<</if>>
-		<<if $options.images is 1 and setup.plants[$_type].icon>>
-			<img class="tending_icon" @src="`img/misc/icon/tending/` + setup.plants[$_type].icon">
-		<</if>>
-		<<print setup.plants[$_type].plural>>。
-	<<else>>
-		<<if $options.images is 1 and setup.plants[$_type].icon>>
-			<img class="tending_icon" @src="`img/misc/icon/tending/` + setup.plants[$_type].icon">
-		<</if>>
-		<<number _tending_amount>>个<<print setup.plants[$_type].plural>>。
-	<</if>>
+    <<if !setup.plants[$_type].special.includes("large") and setup.plants[$_type].bed isnot "bird_nest">>
+        <<set _tending_amount *= (1 + (currentSkillValue('tending') / 1000))>>
+    <</if>>
+
+    <<if $backgroundTraits.includes("greenthumb")>>
+        <<set _tending_amount *= 1.2>>
+    <</if>>
+
+    <<set _tending_amount to Math.trunc(_tending_amount)>>
+
+    <<run setup.SG_FoodCompat.addHarvest($_type, _tending_amount)>>
+    <<run setup.SG_FoodCompat.clearTempPlant($_type)>>
+
+    <<set $wild_plant_stat += _tending_amount>>
+
+    你拿起
+    <<if $_type is "bird_egg">>
+        了
+    <</if>>
+
+    <<if _tending_amount is 1>>
+        一个
+        <<if $options.images is 1 and setup.plants[$_type].icon>>
+            <img class="tending_icon" @src="setup.SG_FoodCompat.iconPath($_type)">
+        <</if>>
+        <<print setup.plants[$_type].plural>>。
+    <<else>>
+        <<if $options.images is 1 and setup.plants[$_type].icon>>
+            <img class="tending_icon" @src="setup.SG_FoodCompat.iconPath($_type)">
+        <</if>>
+        <<number _tending_amount>>个<<print setup.plants[$_type].plural>>。
+    <</if>>
 <</widget>>
 
 <<widget "SG_tending_give">>
-	<<if _args[0]>>
-		<<set $_type to _args[0]>>
-		<<if $plants[$_type] is undefined>>
-			<<set $plants[$_type] to {"name": setup.plants[$_type].name, "plural": setup.plants[$_type].plural, "amount": 0}>>
-		<<elseif $plants[$_type].name is undefined>>
-			<<set $plants[$_type] to {"name": setup.plants[$_type].name, "plural": setup.plants[$_type].plural, "amount": $plants[$_type].amount}>>
-		<</if>>
+    <<if _args[0]>>
+        <<set $_type to _args[0]>>
+        <<set _amount to (_args[1] ? _args[1] : 1)>>
 
-		<<set $plants[$_type].amount += (_args[1] ? _args[1] : 1)>>
-	<</if>>
+        <<if $plants[$_type] is undefined>>
+            <<set $plants[$_type] to {
+                "name": setup.plants[$_type].name,
+                "plural": setup.plants[$_type].plural,
+                "amount": 0
+            }>>
+        <<elseif $plants[$_type].name is undefined>>
+            <<set $plants[$_type] to {
+                "name": setup.plants[$_type].name,
+                "plural": setup.plants[$_type].plural,
+                "amount": $plants[$_type].amount
+            }>>
+        <</if>>
+
+        <<run setup.SG_FoodCompat.addHarvest($_type, _amount)>>
+        <<run setup.SG_FoodCompat.clearTempPlant($_type)>>
+    <</if>>
 <</widget>>
 
 <<widget "SG_tending_season_notice">>
