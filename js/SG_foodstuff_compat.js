@@ -121,7 +121,12 @@
         applyOldPlantsPatch() {
             if (!this.isNewVersion()) return false;
 
-            const patch = setup.SG_OldPlants || {};
+            const patch = Object.assign(
+                {},
+                setup.SG_OldPlants || {},
+                setup.SG_CustomPlants || {}
+            );
+            
             if (!patch || typeof patch !== "object") return false;
 
             if (!setup.plants || typeof setup.plants !== "object") {

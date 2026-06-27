@@ -1,3 +1,18 @@
+/* ==========================
+ * Strange Garden 舊版植物資料庫
+ *
+ * 用途：
+ * - 保存舊版 Strange Garden 完整種植資料。
+ * - 作為新版 foodstuff 相容層的基礎資料來源。
+ * - 用於補齊新版已移除的種植相關參數。
+ *
+ * 說明：
+ * - 新版多數物品預設不可種植，
+ *   因此移除了 bed、days、season、
+ *   multiplier 等種植設定。
+ * - 相容層會以本資料庫補齊這些缺失，
+ *   使舊版 Strange Garden 系統能正常運作。
+ * ========================== */
 
 /* globals Dict, PlantSetup */
 // @ts-check
