@@ -259,7 +259,7 @@
         },
 
         ensureStores() {
-            if (!State.variables.plants) {
+            if (!this.isNewVersion() && !State.variables.plants) {
                 State.variables.plants = {};
             }
 
@@ -357,6 +357,10 @@
             if (!State.variables.plants) return;
 
             delete State.variables.plants[id];
+            
+            if (Object.keys(State.variables.plants).length === 0) {
+                delete State.variables.plants;
+            }
         },
 
         init() {
@@ -374,6 +378,6 @@
         }
     };
 
-    setup.SG_FoodCompat.init();
+   setup.SG_FoodCompat.init();
 
 })();
