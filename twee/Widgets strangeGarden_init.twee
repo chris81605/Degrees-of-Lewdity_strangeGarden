@@ -168,49 +168,95 @@
 	<</widget>>	
 	
 <<widget "SG_addPlantsSeeds">>
-    <<if $SG_plants_known is undefined>> 
-        <<set $SG_plants_known = []>> <!-- 如果 $SG_plants_known 未定義，則初始化它 -->
+
+    <<if $SG_plants_known is undefined>>
+        <<set $SG_plants_known = []>>
     <</if>>
 
-    <!-- 先將 $SG_plants_known 中的資料新增至 $plants_known -->
-    <<for _known_plant range $SG_plants_known>>
-        <<if !$plants_known.includes(_known_plant)>> <!-- 確保不重複添加 -->
-            <<set $plants_known.pushUnique(_known_plant)>> <!-- 添加至 plants_known -->
-        <</if>>
-    <</for>>
+    <<set _hasFoodstuffData to false>>
 
-    <!-- 然後再處理 $plants 中的植物 -->
-    <<for _plant_key range Object.keys($plants)>> <!-- 遍歷所有植物 -->
-        <<set _plant_data to $plants[_plant_key]>>
+    <<if $foodstuff && typeof $foodstuff is "object">>
+        <<for _food_id range Object.keys($foodstuff)>>
+            <<set _food_data to $foodstuff[_food_id]>>
 
-        <<if _plant_data.amount gt 0>> <!-- 持有數量大於 0 -->
-            <<if !$plants_known.includes(_plant_data.name)>> <!-- 確保不重複添加 -->
-                <<set $SG_plants_known.pushUnique(_plant_data.name)>> <!-- 添加到 SG_plants_known -->
-                <<set $plants_known.pushUnique(_plant_data.name)>> <!-- 添加到 plants_known -->
+            <<if _food_data
+                && typeof _food_data is "object"
+                && _food_data.amount isnot undefined>>
+                <<set _hasFoodstuffData to true>>
+                <<break>>
+            <</if>>
+        <</for>>
+    <</if>>
+
+    <!-- 新版 -->
+    <<if _hasFoodstuffData>>
+
+        <<for _plant_id range Object.keys($foodstuff)>>
+            <<set _plant_data to $foodstuff[_plant_id]>>
+
+            <<if _plant_data
+                && _plant_data.amount gt 0
+                && setup.plants[_plant_id]>>
+
+                <<if !$plants_known.includes(_plant_id)>>
+                    <<set $SG_plants_known.pushUnique(_plant_id)>>
+                    <<set $plants_known.pushUnique(_plant_id)>>
+                <</if>>
+
+            <</if>>
+        <</for>>
+
+    <!-- 舊版 -->
+    <<else>>
+
+        <<for _plant_id range Object.keys($plants)>>
+            <<set _plant_data to $plants[_plant_id]>>
+
+            <<if _plant_data
+                && _plant_data.amount gt 0
+                && setup.plants[_plant_id]>>
+
+                <<if !$plants_known.includes(_plant_id)>>
+                    <<set $SG_plants_known.pushUnique(_plant_id)>>
+                    <<set $plants_known.pushUnique(_plant_id)>>
+                <</if>>
+
+            <</if>>
+        <</for>>
+
+    <</if>>
+
+<</widget>>
+    
+<<widget "removeSGPlantsSeeds">><!--將非植物產品從可種植項目移除-->
+    <<set _plant_keys to Object.keys(setup.plants)>>
+
+    <<for _i to 0; _i lt _plant_keys.length; _i++>>
+        <<set _plant_id to _plant_keys[_i]>>
+        <<set _plant_data to setup.plants[_plant_id]>>
+
+        <<if _plant_data.type isnot "flower" and _plant_data.type isnot "vegetable">>
+            <<if $plants_known.includes(_plant_id)>>
+                <<set $plants_known.delete(_plant_id)>>
             <</if>>
         <</if>>
     <</for>>
 <</widget>>
     
-    <<widget "removeSGPlantsSeeds">><!--將非植物產品從可種植項目移除-->
-	    <<set _plant_keys to Object.keys(setup.plants)>>
-	    <<for _i to 0; _i lt _plant_keys.length; _i++>>
-	        <<if setup.plants[_plant_keys[_i]].type isnot "flower" and setup.plants[_plant_keys[_i]].type isnot "vegetable">>
-		        <<if $plants_known.includes(setup.plants[_plant_keys[_i]].name)>>
-		            <<set $plants_known.delete(setup.plants[_plant_keys[_i]].name)>>
-		        <</if>>
-		    <</if>>
-	    <</for>>
-    <</widget>>
-    
-    <<widget "SG_addAllPlantsSeeds">>
-	    <<for _plant_key range Object.keys($plants)>>
-            <<set _plant_data to $plants[_plant_key]>>            
-                <<if !$plants_known.includes(_plant_data.name)>> <!-- 確保不重複添加 -->
-                    <<set $SG_plants_known.pushUnique(_plant_data.name)>>
-                    <<set $plants_known.pushUnique(_plant_data.name)>>
-                <</if>>           
-        <</for>>
-    <</widget>>
+<<widget "SG_addAllPlantsSeeds">>
+
+    <<if $SG_plants_known is undefined>>
+        <<set $SG_plants_known = []>>
+    <</if>>
+
+    <<for _plant_id range Object.keys(setup.plants)>>
+
+        <<if !$plants_known.includes(_plant_id)>>
+            <<set $SG_plants_known.pushUnique(_plant_id)>>
+            <<set $plants_known.pushUnique(_plant_id)>>
+        <</if>>
+
+    <</for>>
+<</widget>>
     
     
