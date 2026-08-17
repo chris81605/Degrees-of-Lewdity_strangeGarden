@@ -117,7 +117,19 @@
 
             return changed;
         },
-
+        
+        /*
+         * 是否保留新版 foodstuff 已不存在的舊版作物。
+         *
+         * false：
+         *   舊版資料若在新版 foodstuff 找不到，就不加入 setup.plants。
+         *   避免收成後寫入不存在的新版物品 id，造成遊戲異常。
+         *
+         * 注意：
+         *   setup.SG_CustomPlants 內的資料視為手動確認過，仍會保留。
+         */
+        keepLegacyPlants: false,
+        
         applyOldPlantsPatch() {
             if (!this.isNewVersion()) return false;
 
@@ -140,6 +152,15 @@
                 if (!oldPlant) continue;
 
                 const food = setup.foodstuff && setup.foodstuff[id];
+                
+                /*
+                * 若新版已不存在此物品，依設定決定是否保留。
+                */
+                if (!food &&
+                    !this.keepLegacyPlants &&
+                    !(id in setup.SG_CustomPlants)) {
+                    continue;
+                }
 
                 /*
                  * 舊版種植邏輯為主：
@@ -176,6 +197,67 @@
             return changed;
         },
 
+        patchFoodstuffFromPlants() {
+            if (!this.isNewVersion()) return false;
+            if (!setup.plants || typeof setup.plants !== "object") return false;
+
+            let changed = false;
+
+            for (const id in setup.plants) {
+                const plant = setup.plants[id];
+                const food = setup.foodstuff[id];
+
+                if (!plant || !food) continue;
+
+                if (!food.tending || typeof food.tending !== "object") {
+                    food.tending = {};
+                    changed = true;
+                }
+
+                const tending = food.tending;
+
+                if (tending.growth_days === undefined && plant.days !== undefined) {
+                    tending.growth_days = plant.days;
+                    changed = true;
+                }
+
+                if (tending.planting_bed === undefined && plant.bed !== undefined) {
+                    tending.planting_bed = plant.bed;
+                    changed = true;
+                }
+
+                if (tending.yield_multiplier === undefined && plant.multiplier !== undefined) {
+                    tending.yield_multiplier = plant.multiplier;
+                    changed = true;
+                }
+
+                if (tending.seasons === undefined && plant.season !== undefined) {
+                    tending.seasons = Array.isArray(plant.season)
+                        ? plant.season.slice()
+                        : [plant.season];
+                    changed = true;
+                }
+
+                if (tending.tags === undefined && plant.special !== undefined) {
+                    tending.tags = Array.isArray(plant.special)
+                        ? plant.special.slice()
+                        : [];
+                    changed = true;
+                }
+
+                if (tending.has_seeds === undefined && plant.has_seeds !== undefined) {
+                    tending.has_seeds = plant.has_seeds;
+                    changed = true;
+                }
+            }
+
+            if (changed) {
+                console.log("[SG_FoodCompat] setup.plants -> setup.foodstuff tending compat patched", setup.foodstuff);
+            }
+
+            return changed;
+        },
+
         ensureStores() {
             if (!State.variables.plants) {
                 State.variables.plants = {};
@@ -191,40 +273,17 @@
         },
 
         rebuildPlantsKnown() {
-            
-            if (!this.isNewVersion()) return;
-            
             if (!Array.isArray(State.variables.plants_known)) {
                 State.variables.plants_known = [];
             }
 
             /*
-             * 新版：
-             * 重新整理 plants_known，只保留 setup.plants 裡真的存在的項目。
-             * 避免舊存檔或舊初始化殘留不存在的 id。
-             */
-            if (this.isNewVersion()) {
-                State.variables.plants_known = [];
-
-                for (const id in setup.plants) {
-                    const plant = setup.plants[id];
-                    if (!plant) continue;
-
-                    if (!State.variables.plants_known.includes(id)) {
-                        State.variables.plants_known.push(id);
-                    }
-                }
-
-                return;
-            }
-
-            /*
-             * 舊版：
-             * 不重建，只過濾掉不存在的 id。
-             */
-            State.variables.plants_known = State.variables.plants_known.filter(id => {
-                return setup.plants && setup.plants[id];
-            });
+            * 清理已不存在於 setup.plants 的項目。
+            */
+            State.variables.plants_known =
+                State.variables.plants_known.filter(id => {
+                    return setup.plants && setup.plants[id];
+                });
         },
 
         getPlant(id) {
@@ -303,6 +362,7 @@
         init() {
             this.buildPlantsDbFromFoodstuff();
             this.applyOldPlantsPatch();
+            this.patchFoodstuffFromPlants();
 
             try {
                 this.ensureStores();
