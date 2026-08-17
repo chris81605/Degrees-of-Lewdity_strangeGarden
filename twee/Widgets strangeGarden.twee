@@ -553,6 +553,11 @@
      * - 實際收成數量會由 setup.SG_FoodCompat.addHarvest()
      *   寫入 $foodstuff。
      */
+     
+    <<if $plants is undefined>>
+        <<set $plants to {}>>
+    <</if>>
+       
     <<if $plants[$_type] is undefined>>
         <<set $plants[$_type] to {
             "name": setup.plants[$_type].name,
@@ -654,6 +659,10 @@
 	*/
     <<set $_type to _args[0]>>
 
+    <<if $plants is undefined>>
+        <<set $plants to {}>>
+    <</if>>
+
     <<if $plants[$_type] is undefined>>
         <<set $plants[$_type] to {"name": setup.plants[$_type].name, "plural": setup.plants[$_type].plural, "amount": 0}>>
     <<elseif $plants[$_type].name is undefined>>
@@ -704,6 +713,10 @@
     <<if _args[0]>>
         <<set $_type to _args[0]>>
         <<set _amount to (_args[1] ? _args[1] : 1)>>
+
+        <<if $plants is undefined>>
+            <<set $plants to {}>>
+        <</if>>
 
         <<if $plants[$_type] is undefined>>
             <<set $plants[$_type] to {
