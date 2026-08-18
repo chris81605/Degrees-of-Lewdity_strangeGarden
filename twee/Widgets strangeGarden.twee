@@ -86,15 +86,6 @@
 
     <<set _bedType = _bedNames[_plot.bed] || _plot.bed>>
 
-    /* 定義品質對應的描述前綴 */
-    <<set _qualityPrefixes = {
-        blue: "blue",
-        lblue: "lblue",
-        teal: "teal",
-        green: "green",
-        default: "red"
-    }>>
-
     /* 針對每種 bed 類型，定義對應的品質描述文字 */
     <<set _bedQualityDesc = {
         wood: ["破爛的","普通的","優良的","上好的"],
@@ -125,13 +116,6 @@
     <<set _location to _args[0]>>
     <<set $_plotsHere to $plots[_location]>>
 
-<<set _stageText = {
-        1: { color: "blue" },
-        2: { color: "blue" },
-        3: { color: "lblue" },
-        4: { color: "teal" },
-        5: { color: "green" }
-    }>>
     
     <<set _plantStageDesc = {
         wood: ["這裡種植了{plant}。","這裡種植了{plant}，{plant}長出一點了。","這裡種植了{plant}，{plant}正在生長。","這裡種植了{plant}，{plant}快開傘了。","這裡種植了{plant}，{plant}已經開傘了，可以收成了。"],
@@ -264,7 +248,6 @@
 <<widget "SG_tendingWaterPlot">>
 	<<set _plantbed to _args[0]>>
 
-	<<set _water_needed += 1>>
 	<<switch _plantbed.size>>
 		<<case "small">><<set _tStatup to 1>><<set _tPass to 5>>
 		<<case "medium">><<set _tStatup to 2>><<set _tPass to 15>>
@@ -297,7 +280,6 @@
 <<widget "SG_tendingPlantSeedsOptionsList">>
 	<<set _location to _args[0]>>
 	<<set _plantbed to _args[1]>>
-	<<set _invalidPlantsRef to _args[2]>>
 
 	<<for _plantType range $plants_known>>
 		<<set $_plant to setup.plants[_plantType]>>
@@ -350,14 +332,7 @@
 		在野外寻找种子种植，或取得產品。
 	<</if>>
 
-	<<switch _location>>
-		<<case "farm">>
-			<<set _irrigation to ($farm.irrigation ? $farm.irrigation : 0)>>
-		<<default>>
-			<<set _irrigation to 0>>
-	<</switch>>
 
-	<<set _invalidPlants to "">>
 	<<set _collapseLimit to 8>>
 
 	<<set _validCount to $plants_known.filter(id => {
@@ -412,9 +387,6 @@
 
 	<<set _timeString to getTimeString(_baseTime)>>
 
-	<<if $farm_attack_timer is 0>>
-		<<set $_timeUntilAttack to ((23 - Time.hour) * 60) + (60 - Time.minute)>>
-	<</if>>
 	<<if $leftarm is "bound" and $rightarm is "bound">>
 		<span class="red">你的手臂被捆绑住了，你无法进耕种。</span>
 		<br>
@@ -509,70 +481,11 @@
 	
 <</widget>>
 
-<<widget "SG_tending_day">>
-	<<for _location range Object.keys($plots)>>
-		<<switch _location>>
-			<<case "farm">> <<set _irrigation to ($farm.irrigation ? $farm.irrigation : 0)>>
-			<<default>> <<set _irrigation to 0>>
-		<</switch>>
-		<<for $_plot range $plots[_location]>>
-			/* growth check */
-			<<if $_plot.stage gte 1 and ($_plot.water is 1 or $_plot.bed is "water")>>
-				<<set $_plot.days += 1>>
-				<<if $_plot.days gte setup.plants[$_plot.plant].days * (($_plot.stage+1) / 5)>>
-					<<set $_plot.stage += 1>>
-				<</if>>
-			<</if>>
-
-			/* should this check really happen AFTER the growth check? */
-			<<if $weather is "rain">>
-				<<set $_plot.water to 1>>
-			<<elseif _irrigation gte 1>>
-				<<set $_plot.water to 1>>
-				<<set _irrigation-->>
-			<<else>>
-				<<set $_plot.water to 0>>
-			<</if>>
-		<</for>>
-	<</for>>
-<</widget>>
 
 <<widget "SG_tending_harvest">>
     /* Argument is the plot you want to harvest */
     <<set $_plot to _args[0]>>
     <<set $_type to $_plot.plant>>
-
-    /*
-     * 初始化植物資料。
-     *
-     * 舊版：
-     * - $plants 是正式背包倉庫。
-     *
-     * 新版：
-     * - $plants 只作為舊 widget 的暫存資料。
-     * - 實際收成數量會由 setup.SG_FoodCompat.addHarvest()
-     *   寫入 $foodstuff。
-     */
-     
-    <<if $plants is undefined>>
-        <<set $plants to {}>>
-    <</if>>
-       
-    <<if $plants[$_type] is undefined>>
-        <<set $plants[$_type] to {
-            "name": setup.plants[$_type].name,
-            "plural": setup.plants[$_type].plural,
-            "amount": 0,
-            "cummilkamount": 0
-        }>>
-    <<elseif $plants[$_type].name is undefined>>
-        <<set $plants[$_type] to {
-            "name": setup.plants[$_type].name,
-            "plural": setup.plants[$_type].plural,
-            "amount": $plants[$_type].amount,
-            "cummilkamount": $plants[$_type].cummilkamount
-        }>>
-    <</if>>
 
     /* 計算基礎產量 */
     <<switch $_plot.size>>
@@ -639,11 +552,8 @@
      *
      * 新版：
      * - addHarvest() 會寫入 $foodstuff[$_type].amount。
-     * - clearTempPlant() 會清除 $plants[$_type] 暫存，
-     *   避免新版存檔殘留舊版資料造成異常。
      */
     <<run setup.SG_FoodCompat.addHarvest($_type, _tending_amount)>>
-    <<run setup.SG_FoodCompat.clearTempPlant($_type)>>
 
     /* 設定收割後提示用變數 */
     <<set $tendingvars.harvest to true>>
@@ -651,96 +561,5 @@
     <<set $tendingvars.harvest_name to setup.plants[$_type].plural>>
 <</widget>>
 
-<<widget "SG_tending_pick">>
-    /*
-	* First argument: plant type.
-	* Second argument: minimum number picked.
-	* Third argument: maximum number picked.
-	*/
-    <<set $_type to _args[0]>>
 
-    <<if $plants is undefined>>
-        <<set $plants to {}>>
-    <</if>>
 
-    <<if $plants[$_type] is undefined>>
-        <<set $plants[$_type] to {"name": setup.plants[$_type].name, "plural": setup.plants[$_type].plural, "amount": 0}>>
-    <<elseif $plants[$_type].name is undefined>>
-        <<set $plants[$_type] to {"name": setup.plants[$_type].name, "plural": setup.plants[$_type].plural, "amount": $plants[$_type].amount}>>
-    <</if>>
-
-    <<if _args[2] gte 1>>
-        <<set _tending_amount to random(_args[1], _args[2])>>
-    <<else>>
-        <<set _tending_amount to random(1, 5)>>
-    <</if>>
-
-    <<if !setup.plants[$_type].special.includes("large") and setup.plants[$_type].bed isnot "bird_nest">>
-        <<set _tending_amount *= (1 + (currentSkillValue('tending') / 1000))>>
-    <</if>>
-
-    <<if $backgroundTraits.includes("greenthumb")>>
-        <<set _tending_amount *= 1.2>>
-    <</if>>
-
-    <<set _tending_amount to Math.trunc(_tending_amount)>>
-
-    <<run setup.SG_FoodCompat.addHarvest($_type, _tending_amount)>>
-    <<run setup.SG_FoodCompat.clearTempPlant($_type)>>
-
-    <<set $wild_plant_stat += _tending_amount>>
-
-    你拿起
-    <<if $_type is "bird_egg">>
-        了
-    <</if>>
-
-    <<if _tending_amount is 1>>
-        一个
-        <<if $options.images is 1 and setup.plants[$_type].icon>>
-            <img class="tending_icon" @src="setup.SG_FoodCompat.iconPath($_type)">
-        <</if>>
-        <<print setup.plants[$_type].plural>>。
-    <<else>>
-        <<if $options.images is 1 and setup.plants[$_type].icon>>
-            <img class="tending_icon" @src="setup.SG_FoodCompat.iconPath($_type)">
-        <</if>>
-        <<number _tending_amount>>个<<print setup.plants[$_type].plural>>。
-    <</if>>
-<</widget>>
-
-<<widget "SG_tending_give">>
-    <<if _args[0]>>
-        <<set $_type to _args[0]>>
-        <<set _amount to (_args[1] ? _args[1] : 1)>>
-
-        <<if $plants is undefined>>
-            <<set $plants to {}>>
-        <</if>>
-
-        <<if $plants[$_type] is undefined>>
-            <<set $plants[$_type] to {
-                "name": setup.plants[$_type].name,
-                "plural": setup.plants[$_type].plural,
-                "amount": 0
-            }>>
-        <<elseif $plants[$_type].name is undefined>>
-            <<set $plants[$_type] to {
-                "name": setup.plants[$_type].name,
-                "plural": setup.plants[$_type].plural,
-                "amount": $plants[$_type].amount
-            }>>
-        <</if>>
-
-        <<run setup.SG_FoodCompat.addHarvest($_type, _amount)>>
-        <<run setup.SG_FoodCompat.clearTempPlant($_type)>>
-    <</if>>
-<</widget>>
-
-<<widget "SG_tending_season_notice">>
-	<<set $_plant to _args[0]>>
-	<span class="blue">
-		<<set $_seasons to formatList($_plant.season)>>
-		<<print $_plant.plural>>只能在<<print $_seasons.replace("autumn", "秋天").replace("winter", "冬天").replace("spring", "春天").replace("summer", "夏天").replace("and", "和")>>进行种植。
-	</span>
-<</widget>>

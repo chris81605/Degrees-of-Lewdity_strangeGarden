@@ -30,7 +30,7 @@
         <<set $SG_state to {}>> 
     <</if>>
     
-    <<set $SG_defaults to {
+    <<set _SG_defaults to {
         earth_upgrade: 0,
         water_upgrade: 0,
         bird_nest_upgrade: 0,
@@ -46,9 +46,9 @@
         fertiliser: {current: 0, used: 0}
     }>>
 
-    <<for _key range Object.keys($SG_defaults)>>
+    <<for _key range Object.keys(_SG_defaults)>>
         <<if not $SG_state[_key]>>
-            <<set $SG_state[_key] to $SG_defaults[_key]>>
+            <<set $SG_state[_key] to _SG_defaults[_key]>>
         <</if>>
     <</for>>
 <</widget>>
@@ -56,9 +56,7 @@
 <<widget "reset_strangeGarden">>
     <<unset $first_visit_strangeGarden>>
     <<unset $strangeGarden_stage>>
-    <<unset $SG_defaults>>
     <<unset $SG_state>>
-    <<unset $SG_plants_known>>
 <</widget>>
 		
 	<<widget "strangeGarden_link">>
@@ -134,7 +132,7 @@
 			<</if>>
 			遠處工坊內似乎還有甚麼設備，不過布滿灰塵，零件散落四周，得好好整理一番。<br>
 			<<if $SG_state.wood_upgrade lte 2 or $debug is 1>>
-				<<gardenicon "till">><<link [[查看堆置的木頭(1:00)|strangeGarden_upgrade]]>><<pass 1 hours>><<add_plot strangeGarden wood 1 small>><<set $SG_upgrade_type to 4>><</link>><br>
+				<<gardenicon "till">><<link [[查看堆置的木頭(1:00)|strangeGarden_upgrade]]>><<pass 1 hours>><<set $SG_upgrade_type to 4>><</link>><br>
 			<</if>>
 			<<if $SG_state.hive_upgrade lte 2 or $debug is 1>>
 				<<gardenicon "till">><<link [[查看散落的木箱(1:00)|strangeGarden_upgrade]]>><<pass 1 hours>><<set $SG_upgrade_type to 5>><</link>><br>
@@ -169,10 +167,6 @@
 	
 <<widget "SG_addPlantsSeeds">>
 
-    <<if $SG_plants_known is undefined>>
-        <<set $SG_plants_known = []>>
-    <</if>>
-
     <<set _hasFoodstuffData to false>>
 
     <<if $foodstuff && typeof $foodstuff is "object">>
@@ -199,7 +193,6 @@
                 && setup.plants[_plant_id]>>
 
                 <<if !$plants_known.includes(_plant_id)>>
-                    <<set $SG_plants_known.pushUnique(_plant_id)>>
                     <<set $plants_known.pushUnique(_plant_id)>>
                 <</if>>
 
@@ -217,7 +210,6 @@
                 && setup.plants[_plant_id]>>
 
                 <<if !$plants_known.includes(_plant_id)>>
-                    <<set $SG_plants_known.pushUnique(_plant_id)>>
                     <<set $plants_known.pushUnique(_plant_id)>>
                 <</if>>
 
@@ -245,14 +237,9 @@
     
 <<widget "SG_addAllPlantsSeeds">>
 
-    <<if $SG_plants_known is undefined>>
-        <<set $SG_plants_known = []>>
-    <</if>>
-
     <<for _plant_id range Object.keys(setup.plants)>>
 
         <<if !$plants_known.includes(_plant_id)>>
-            <<set $SG_plants_known.pushUnique(_plant_id)>>
             <<set $plants_known.pushUnique(_plant_id)>>
         <</if>>
 
