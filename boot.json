@@ -1,8 +1,9 @@
 {
   "name": "StrangeGarden",
-  "version": "0.20.4",
+  "version": "0.21",
   "styleFileList": [],
   "scriptFileList": [
+    "js/SGTendingCompat.js",
     "js/SGOldPlants.js",
     "js/SGcustomPlants.js",
     "js/SG_foodstuff_compat.js",
