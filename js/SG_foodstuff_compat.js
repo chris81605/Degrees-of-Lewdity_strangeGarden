@@ -267,9 +267,6 @@
                 State.variables.plants_known = [];
             }
 
-            if (this.isNewVersion() && State.variables.foodstuff === undefined) {
-                State.variables.foodstuff = {};
-            }
         },
 
         rebuildPlantsKnown() {
@@ -349,18 +346,6 @@
 
             store[id].amount = Number(store[id].amount) || 0;
             store[id].amount += amount;
-        },
-
-        clearTempPlant(id) {
-            if (!this.isNewVersion()) return;
-            if (!id) return;
-            if (!State.variables.plants) return;
-
-            delete State.variables.plants[id];
-            
-            if (Object.keys(State.variables.plants).length === 0) {
-                delete State.variables.plants;
-            }
         },
 
         init() {
