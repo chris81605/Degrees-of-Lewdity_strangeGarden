@@ -363,6 +363,100 @@
         }
     };
 
-   setup.SG_FoodCompat.init();
+    setup.SG_FoodCompat.init();
+
+    /*
+     * 上面這行 init() 在腳本載入時其實補不到任何 tending 資料。
+     *
+     * 原版的 setup.foodstuff 是在 StoryInit 內以 <<run initFoodstuff()>> 才建立的，
+     * 而模組腳本比它更早執行，此時 setup.foodstuff 還不存在，
+     * isNewVersion() 為 false，buildPlantsDbFromFoodstuff() / applyOldPlantsPatch() /
+     * patchFoodstuffFromPlants() 三個都會直接 return。
+     *
+     * 而原版 tendingDay() 換日時會對 $plots 內每個格子取
+     *     setup.foodstuff[plot.plant].tending.growth_days
+     * 完全沒有 null 檢查。只要格子裡是原版沒有 tending 欄位的物品
+     * （例如 bird_egg），而該格子的 water 是 1 —— 下雨時原版會把所有格子
+     * 的 water 都設成 1 —— 換日就會拋出
+     *     TypeError: Cannot read properties of undefined (reading 'growth_days')
+     * 導致 <<pass>> 失敗（玩家看到的「換日報錯」）。
+     *
+     * 因此這裡額外在原版 initFoodstuff() 執行完後、以及第一次 passage 結束後
+     * 各補一次相容資料，不再依賴玩家是否進過 strangeGarden。
+     */
+    function lateCompatInit() {
+        /*
+         * init() 最後的 rebuildPlantsKnown() 在 setup.plants 尚未建立時
+         * 會把 $plants_known 清空，所以資料還沒準備好就先不要跑。
+         */
+        if (!setup.foodstuff || (!setup.SG_OldPlants && !setup.SG_CustomPlants)) return;
+
+        try {
+            setup.SG_FoodCompat.init();
+        } catch (e) {
+            console.warn("[SG_FoodCompat] late init failed:", e);
+        }
+    }
+
+    /*
+     * 保險：萬一 $plots 裡出現了 setup.plants 查不到的 plant
+     * （舊存檔殘留、或未來新增的物品），原版 tendingDay() 還是會崩潰。
+     * 這裡只補「缺少 tending」的項目，不覆蓋任何既有設定。
+     */
+    function guardPlotsTending() {
+        try {
+            const plots = State.variables && State.variables.plots;
+            const foodstuff = setup.foodstuff;
+            if (!plots || !foodstuff) return;
+
+            let fixed = 0;
+            for (const location of Object.keys(plots)) {
+                const area = plots[location];
+                if (!Array.isArray(area)) continue;
+
+                for (const plot of area) {
+                    if (!plot || !plot.plant || plot.plant === "none") continue;
+
+                    const item = foodstuff[plot.plant];
+                    if (item && !item.tending) {
+                        item.tending = {
+                            growth_days: 5,
+                            planting_bed: "earth",
+                            yield_multiplier: 1,
+                            seasons: ["spring", "summer", "autumn", "winter"],
+                            tags: []
+                        };
+                        fixed++;
+                    }
+                }
+            }
+
+            if (fixed > 0) {
+                console.warn(`[SG_FoodCompat] added fallback tending for ${fixed} plot plant(s)`);
+            }
+        } catch (e) {
+            console.warn("[SG_FoodCompat] guardPlotsTending failed:", e);
+        }
+    }
+
+    if (typeof window.initFoodstuff === "function") {
+        const _origInitFoodstuff = window.initFoodstuff;
+        window.initFoodstuff = function () {
+            const result = _origInitFoodstuff.apply(this, arguments);
+            lateCompatInit();
+            return result;
+        };
+    }
+
+    if (typeof $ === "function") {
+        $(document).one(":passageend.SG_FoodCompatLateInit", function () {
+            lateCompatInit();
+            guardPlotsTending();
+        });
+
+        $(document).on(":passageend.SG_FoodCompatGuard", function () {
+            guardPlotsTending();
+        });
+    }
 
 })();

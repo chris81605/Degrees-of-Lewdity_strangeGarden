@@ -18,6 +18,17 @@
   * 在工業區增加一個可以生產任何商品的生產基地。
   
 # 更新日誌
+**0.21.1**
+* 修復換日時可能報錯 `Cannot read properties of undefined (reading 'growth_days')` 的問題。
+    - 原版 `setup.foodstuff` 要到 StoryInit 的 `<<run initFoodstuff()>>` 才建立，
+      而 `SG_FoodCompat.init()` 在模組腳本載入時就執行了，因此當時補不到任何 tending 資料；
+      之後只有在玩家進入 strangeGarden 場景時才會再補一次。
+      若玩家在本次載入後尚未進過奇怪花園就換日（且該格 water 為 1，例如下雨），
+      原版 `tendingDay()` 便會對沒有 tending 的物品（如 bird_egg）取 `.growth_days` 而拋錯。
+    - 現在改為在原版 `initFoodstuff()` 執行完後、以及第一次 passage 結束後各補一次相容資料。
+    - 另新增保險：每次 passage 結束後檢查 `$plots` 內所有 `plant` 是否都有 `tending`，
+      缺少的補上預設值，避免舊存檔殘留或未來新增物品時再次崩潰。
+
 **0.21**
 * 優化種植系統相關程式碼，清理舊版種植系統拆分後遺留的不必要代碼。
     - 移除目前已不再使用的舊版種植功能及重複處理邏輯，簡化新版物品相容及收成流程。

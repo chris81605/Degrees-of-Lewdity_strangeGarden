@@ -1,6 +1,6 @@
 {
   "name": "StrangeGarden",
-  "version": "0.21",
+  "version": "0.21.1",
   "styleFileList": [],
   "scriptFileList": [
     "js/SGTendingCompat.js",
