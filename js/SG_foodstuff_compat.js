@@ -17,6 +17,11 @@
  *   等待原版 setup.foodstuff 真正初始化完成後，
  *   才執行 Foodstuff 相容邏輯
  *
+ * 注意：
+ * - 部分框架可能會預先建立空的 setup.foodstuff = {}
+ * - 因此「物件存在」不代表原版 foodstuff 已初始化完成
+ * - 新版只有在 setup.foodstuff 為非空普通物件時才視為 ready
+ *
  * 異常：
  * - SG-INIT-01：等待 StartConfig.version 逾時
  * - SG-INIT-02：已確認為 Foodstuff 版本，但 setup.foodstuff 等待逾時
@@ -27,10 +32,25 @@
 
     const FOODSTUFF_VERSION = "0.5.10.12";
     const INIT_CHECK_INTERVAL = 100;
+    /*
+     * StartConfig.version / setup.foodstuff 最長等待時間。
+     * 正常情況應該很快就會完成，30 秒主要用來避免異常環境永久輪詢。
+     */
     const INIT_TIMEOUT = 30 * 1000;
-
+    
+    /* =========================================================
+     * Foodstuff Compat
+     * ========================================================= */
     setup.SG_FoodCompat = {
-
+        
+        /*
+         * 判斷目前是否已存在新版 foodstuff 資料模型。
+         *
+         * 注意：
+         * 這個函式保留原本用途。
+         * 真正的新舊遊戲版本判斷由 bootstrap 使用
+         * StartConfig.version 負責。
+         */
         isNewVersion() {
             return !!setup.foodstuff &&
                 typeof setup.foodstuff === "object" &&
@@ -52,8 +72,15 @@
 
             /*
              * 只轉換完整新版種植資料。
+             *
+             * 例如 bird_egg 只有
+             * affected_by_tending_skill / tags，
              * 例如 bird_egg 只有 affected_by_tending_skill / tags，
              * 不應自動變成 earth / 5 天。
+             *
+             * Strange Garden 若允許此類物品種植，
+             * 應由 SG_OldPlants / SG_CustomPlants
+             * 提供真正的舊版種植資料。
              */
             if (!this.isCompleteTending(tending)) {
                 return null;
@@ -386,7 +413,11 @@
             if (amount <= 0) return;
 
             this.ensureStores();
-
+            
+            /*
+             * 新版：
+             * 收成寫入 $foodstuff。
+             */
             if (this.isNewVersion()) {
                 const store = State.variables.foodstuff;
 
@@ -398,7 +429,11 @@
                 store[id].amount += amount;
                 return;
             }
-
+            
+            /*
+             * 舊版：
+             * 收成維持寫入 $plants。
+             */
             const store = State.variables.plants;
             const plant = this.getPlant(id);
 
@@ -469,8 +504,7 @@
         console.error(`[SG_FoodCompat][${code}] ${message}`);
 
         /*
-         * 使用 ModLoader 內建 SweetAlert2。
-         * 不使用瀏覽器 alert()。
+         * 使用 ModLoader 內建 SweetAlert2。       
          */
         if (window.modSweetAlert2Mod?.fire) {
             window.modSweetAlert2Mod.fire({
