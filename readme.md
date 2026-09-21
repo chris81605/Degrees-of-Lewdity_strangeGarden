@@ -18,6 +18,14 @@
   * 在工業區增加一個可以生產任何商品的生產基地。
   
 # 更新日誌
+**0.21.1**
+* 修復換日時可能出現 `Cannot read properties of undefined (reading 'growth_days')` 的問題。
+    - 原版 `setup.foodstuff` 需等到 `StoryInit` 執行 `initFoodstuff()` 後才會建立，而 Strange Garden 的相容處理原先可能在此之前執行，導致部分特殊種植物品未能正確補齊 `tending` 資料。
+    - 若玩家載入存檔後尚未進入農場便直接換日，且田地處於可進行種植判定的狀態（例如下雨後），原版 `tendingDay()` 可能因缺少 `growth_days` 而報錯。
+    - 現在會等待原版 Foodstuff 資料初始化完成後，再執行 Strange Garden 的相容處理，確保相關 `tending` 資料正確補齊。
+    - 新增初始化異常檢測；若無法取得遊戲版本資訊，或 Foodstuff 未能在預期時間內完成初始化，將顯示對應錯誤代碼與警告訊息，方便辨識及回報問題。
+    - 感謝 **Neko-Yukari** 提交 PR 並協助發現、定位 Foodstuff 初始化時序問題。本次修復參考其提供的問題分析，重新調整了 Strange Garden 的相容初始化流程。
+
 **0.21**
 * 優化種植系統相關程式碼，清理舊版種植系統拆分後遺留的不必要代碼。
     - 移除目前已不再使用的舊版種植功能及重複處理邏輯，簡化新版物品相容及收成流程。
